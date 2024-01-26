@@ -1,0 +1,38 @@
+@charset "UTF-8";
+
+.avisoborrado {
+    text-align: center;
+    color: red;
+}
+
+#command {
+	width: 95%;
+}
+
+.selectBoxArrow{
+	padding: 0px;
+	position:absolute;
+	right: 0px;
+	cursor: default;
+}	
+.selectBoxInput{
+	padding:5px;
+	border:0px;
+	padding-left:1px;
+	height:16px;
+}
+
+.selectBoxOptionContainer{
+	border:1px solid #881536;
+	max-height:100px;
+	background-color:#FFF;
+	visibility:hidden;
+	overflow:auto;
+}
+.selectBoxAnOption{
+	cursor:default;
+	margin:1px;
+	overflow:hidden;
+	white-space:nowrap;
+	color: initial;
+}

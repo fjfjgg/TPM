@@ -1,0 +1,18 @@
+{
+	"propiedad": "Ejemplo de configuración JSON",
+	"comentario": "Las herramientas de tipo DESCONOCIDO solo esperan y no hacen nada",
+	"propiedad2": true,
+	"propiedad3": 1,
+	"propiedad4": [ "Por defecto se expera el máximo tiempo ",
+					"o 5 segundos si es infinito.",
+					"Si hay argumentos extras, el primero se intenta ",
+					"interpretar como el número de segundos a esperar." ],
+	"propiedad5": {
+		"subp1": "subpropiedad",
+		"subp2": 3,
+		"subp3": {
+			"key": "x",
+			"value": false
+		}
+	}
+}

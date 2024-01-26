@@ -1,0 +1,72 @@
+{
+  "url": "https://postman-echo.com/post",
+  "noVerifyCertificate": false,
+  "requestMethod": "POST",
+  "headers": [
+    {
+      "key": "Cache-Control",
+      "value": "no-cache",
+      "literal": true
+    }
+    ],
+  "contentType": "multipart/form-data;charset=utf-8",
+  "parameters": [
+    {
+      "key": "argumentos",
+      "value": "Usados con ${n-1}",
+      "literal": true
+    },
+    {
+      "key": "consumerId",
+      "value": "${0}",
+      "literal": false
+    },
+    {
+      "key": "originalFileName",
+      "value": "${1}",
+      "literal": false
+    },
+    {
+      "key": "counter",
+      "value": "${2}",
+      "literal": false
+    },
+    {
+      "key": "isInstructor",
+      "value": "${3}",
+      "literal": false
+    },
+    {
+      "key": "extra1",
+      "value": "${4}",
+      "literal": false
+    },
+    {
+      "key": "extra2",
+      "value": "${5}",
+      "literal": false
+    },
+    {
+      "key": "extra3",
+      "value": "${6}",
+      "literal": false
+    },
+    {
+      "key": "extra4",
+      "value": "${7}",
+      "literal": false
+    }
+  ],
+  "fileParameter": "uploadFile",
+  "requestBody": null,
+  "jsonResponse": true,
+  "responseTemplate": [
+    "<div style='text-align: left'>",
+    "<p>Resultado</p><pre style='white-space: pre-wrap;'>",
+    "${body}",
+    "</pre></div>"
+    ],
+  "scoreTemplate": null,
+  "defaultScoreOnSuccess": 100,
+  "defaultScoreOnError": 111
+}

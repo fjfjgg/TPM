@@ -1,0 +1,18 @@
+{
+  "corrector": "~/corrector.sh",
+  "remoteFolder": "~/tmp",
+  "servers": [ "usuario1@servidor1", "usuario2@servidor2", "//usuario3@servidor3:puerto" ],
+  "roundRobin": true,
+  "privateKeyLines": ["-----BEGIN RSA PRIVATE KEY-----",
+                      "datos de la clave privada",
+                      "...",
+                      "...",
+                      "...",
+                      "...",
+                      "abcdefg==",
+                      "-----END RSA PRIVATE KEY-----"],
+  "specialUser": "usuario~test",
+  "specialFile": "update.zip",
+  "specialCorrector": "~/updater.sh"
+}
+

@@ -1,0 +1,127 @@
+
+body {
+	height: auto;
+}
+
+legend
+{
+  color: #881536;
+}
+
+#tool, #outcome,#ex, #passt, #counter, .textCentered {
+  text-align: center;
+}
+
+.infocontainer
+{
+  text-align: left;
+  width: 95%;
+  padding: 10px;
+  margin: 10px auto 30px auto;
+  border: 1px solid black;
+  clear: both;
+}
+
+.infocontainer legend, #fsdelivery legend
+{
+	position: initial;
+	height: auto;
+	line-height: initial;
+	padding: 5px;
+}
+
+#fsdelivery, #divComando
+{
+  width: 90%;
+  text-align:center;
+  padding: 10px;
+  margin: 0 auto;
+  border: 1px solid black;
+  clear: both;
+}
+
+#returnLink, #assess, .genericButton {
+	/*margin-left: 1.4%;*/
+    box-shadow: inset 0px 1px 0px 0px #c62050;
+    background-color: #881536;
+    border: 1px solid #490b1d;
+    border-radius: 4px;
+    display: inline-block;
+    cursor: pointer;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 8px 18px;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.genericButtonMI {
+    box-shadow: inset 0px 1px 0px 0px #c62050;
+    background-color: #881536;
+    border: 1px solid #490b1d;
+    border-radius: 4px;
+    display: inline-block;
+    cursor: pointer;
+    color: #FFFFFF;
+}
+
+#returnLink:hover, #assess:hover, .genericButton:hover {
+	text-decoration: underline;
+	background:linear-gradient(to bottom, #c62050 5%, #881536 100%);
+}
+
+
+#returnContainer {
+	text-align: left;
+	margin-top: 20px;
+}
+
+#result {
+	text-align: center;
+}
+
+#result > p:first-child {
+	padding-top: 2em;
+}
+
+.hidden {
+	display: none;	
+}
+
+.nopadding {
+	padding: 0px;
+}
+
+.closefs {
+	font-size: 12px;
+	cursor: default;
+}
+
+#fsdelivery p {
+	padding: 5px;
+	margin: 10px;
+}
+
+
+.toggleButton {
+	float: right;
+	position: relative;
+	top: -18px;
+	left: -24px;
+}
+
+#attempttext {
+	width: 98%;
+}
+
+#notice {
+  margin: 1em auto;
+  text-align: center;
+  border: 1px solid #881536;
+  border-radius: 10px;
+  padding: 5px;
+  width: 90%;
+}
+
+
