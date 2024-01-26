@@ -150,7 +150,28 @@ mvn package
 
 ## Instalación
 
-Simplemente debe instalar el `war` generado en un servidor de aplicaciones Jakarta EE 10. El servidor solo necesita implementar el *Jakarta EE Web Profile*, como por ejemplo [Tomcat 10.1](https://tomcat.apache.org/download-10.cgi).
+Cree una base de datos usando uno de los scripts SQL que se encuentran en `src/scripts/sql`. Se soporta SQLite, PostgreSQL y MariaDB.
+
+Debe instalar el `war` generado en un servidor de aplicaciones Jakarta EE 10. El servidor solo necesita implementar el *Jakarta EE Web Profile*, como por ejemplo [Tomcat 10.1](https://tomcat.apache.org/download-10.cgi). Debe configurar el recurso a la base de datos en el contexto o globalmente con el nombre `jdbc/ltidb`. Por ejemplo, en Tomcat 10 puede crear el siguiente XML de configuración (`tpm.xml`) para una base de datos SQLite:
+
+````xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Context reloadable="true" >
+        <Resource name="jdbc/ltidb"
+                    auth="Container"
+                    type="javax.sql.DataSource"
+                    driverClassName="org.sqlite.JDBC"
+                    url="jdbc:sqlite:/path/tpm.db/"
+                username=""
+                password=""
+                    maxTotal="1"
+                    maxIdle="1"
+                    maxWaitMillis="-1" />
+        <CookieProcessor sameSiteCookies="strict" />
+</Context>
+````
+
+Arranque el servidor.
 
 Posteriormente, debe acceder a la ruta de contexto de la aplicación una vez desplegada y entrar con el usuario y clave `super`. Cambie la contraseña a otra más segura y cree nuevos usuarios.
 
