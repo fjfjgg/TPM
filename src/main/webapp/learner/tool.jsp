@@ -75,11 +75,13 @@ if (tool != null && tool.getName() != null) {
 	if (resourceTitle!=null && !resourceTitle.isEmpty()) {
 		titulo = resourceTitle;
 	}
-	for (String cssString : cssPaths.split(",")) {	%>
+	if (cssPaths != null) {
+	  for (String cssString : cssPaths.split(",")) {	%>
 	<link rel="stylesheet" type="text/css" href="<%=Encode.forHtmlAttribute(cssString)%>" />
 	<%
+	  }
 	}
-	 %>
+	%>
 	<link rel="stylesheet" type="text/css" href="../css/material-icons.css" />
 	<link rel="stylesheet" type="text/css" href="css/tool.css" />
 	<script>
