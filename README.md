@@ -177,7 +177,7 @@ Posteriormente, debe acceder a la ruta de contexto de la aplicación una vez des
 
 ## Ejemplos de uso
 
-[PENDIENTE]
+* [TPM-sshtool-template](https://github.com/fjfjgg/TPM-sshtool-template) es un ejemplo de herramienta de corrección accesible a través de SSH.
 
 ## Pendiente por hacer (TO DO)
 
