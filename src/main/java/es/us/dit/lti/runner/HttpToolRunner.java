@@ -358,8 +358,8 @@ public class HttpToolRunner implements ToolRunner {
 	 */
 	private HttpUriRequest createRequest(String filePath, String originalFilename, ArrayList<String> args,
 			PrintWriter errorLog) {
-		final List<Entry> parameters = tc.getParameters();
-		final List<Entry> headers = tc.getHeaders();
+		List<Entry> parameters = tc.getParameters();
+		List<Entry> headers = tc.getHeaders();
 		String url = tc.getUrl();
 		String requestBody = tc.getRequestBody();
 		String fileParameter = tc.getFileParameter();
@@ -372,16 +372,26 @@ public class HttpToolRunner implements ToolRunner {
 			if (requestBody != null) {
 				requestBody = replaceRequestTokens(requestBody, args);
 			}
-			for (final Entry e : parameters) {
+			parameters = new ArrayList<Entry>(); //clone 
+			for (final Entry e : tc.getParameters()) {
 				if (!e.literal) {
-					e.key = replaceRequestTokens(e.key, args);
-					e.value = replaceRequestTokens(e.value, args);
+					Entry m = new Entry();
+					m.key = replaceRequestTokens(e.key, args);
+					m.value = replaceRequestTokens(e.value, args);
+					parameters.add(m);
+				} else {
+					parameters.add(e);
 				}
 			}
-			for (final Entry e : headers) {
+			headers = new ArrayList<Entry>(); //clone
+			for (final Entry e : tc.getHeaders()) {
 				if (!e.literal) {
-					e.key = replaceRequestTokens(e.key, args);
-					e.value = replaceRequestTokens(e.value, args);
+					Entry m = new Entry();
+					m.key = replaceRequestTokens(e.key, args);
+					m.value = replaceRequestTokens(e.value, args);
+					parameters.add(m);
+				} else {
+					headers.add(e);
 				}
 			}
 		}
