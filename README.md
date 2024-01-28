@@ -178,6 +178,7 @@ Posteriormente, debe acceder a la ruta de contexto de la aplicación una vez des
 ## Ejemplos de uso
 
 * [TPM-sshtool-template](https://github.com/fjfjgg/TPM-sshtool-template) es un ejemplo de herramienta de corrección accesible a través de SSH.
+* [demo-oauth-lti](https://github.com/fjfjgg/demo-oauth-lti) es una aplicación de intercambio de mensajes integrada con un LMS. Es un ejemplo de una integración de una aplicación web con TPM usando HTTP para el intercambio de datos inicial.
 
 ## Pendiente por hacer (TO DO)
 
