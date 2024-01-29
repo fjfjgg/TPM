@@ -20,7 +20,7 @@ Tool Provider Manager, a LTI v1.1 tool provider for managing non-LTI tools.
 
 Tool Provider Manager, o TPM para abreviar, implementa un proveedor de herramientas (TP) [LTI v1.1](https://www.imsglobal.org/specs/ltiv1p1/implementation-guide). Un TP proporciona herramientas externas a una plataforma de enseñanza virtual LMS (Learning Management System) o consumidor de herramientas (TC) de tal manera que se comparten las credenciales de los usuarios (mediante [OAuth 1.0 Protocol](https://datatracker.ietf.org/doc/html/rfc5849)) y puede registrar calificaciones en el libro de calificaciones del LMS ([LTI Basic Outcomes](https://www.imsglobal.org/spec/lti-bo/v1p1)).
 
-TPM es un gestor de herramientas externas que no soportan LTI v1.1 y que por sí solos no podrían interactuar con el LMS. TPM permite reutilizar herramientas de evaluación principalmente que no estaban pensadas para ejecutarse online o hacer nuevas herramientas fácilmente sin tener que preocuparse por implementar LTI v1.1.
+TPM es un gestor de herramientas externas que no soportan LTI v1.1 y que por sí solas no podrían interactuar con el LMS. TPM permite reutilizar herramientas de evaluación principalmente que no estaban pensadas para ejecutarse online o hacer nuevas herramientas fácilmente sin tener que preocuparse por implementar LTI v1.1.
 
 Actualmente se soportan 2 tipos de "herramientas" que se pueden conectar al TPM:
 
