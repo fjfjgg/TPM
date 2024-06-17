@@ -317,7 +317,7 @@ public class SshToolRunner implements ToolRunner {
 			penvs.put(VAR_COUNTER, String.valueOf(counter));
 			penvs.put(VAR_INSTRUCTOR, String.valueOf(isInstructor));
 			penvs.put(VAR_EXTRA, String.join(" ", extraArgs));
-			if (tc.isRoundRobin()) {
+			if (tc != null && tc.isRoundRobin()) {
 				// generate list of server in counter-based order
 				penvs.put(VAR_SERVERS, generateServersLine(counter));
 			}

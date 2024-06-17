@@ -55,6 +55,11 @@ public class ToolUiConfig implements Serializable {
 	private boolean enableInstructorCommand = false;
 
 	/**
+	 * Ignores consumer CSS style.
+	 */
+	private boolean ignoreConsumerCss = false;
+
+	/**
 	 * Value of the <code>accept</code> attribute of the input of type file.
 	 *
 	 * <p>See <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept">
@@ -121,6 +126,11 @@ public class ToolUiConfig implements Serializable {
 	 * number of attempts.
 	 */
 	private boolean maxAttemptsDependsOnFilenames = false;
+
+	/**
+	 * Ask for the delivery password before showing the page.
+	 */
+	private boolean passwordProtected = false;
 
 	/**
 	 * If enabled, the score/outcome is not saved and a redirect is made to another
@@ -199,6 +209,24 @@ public class ToolUiConfig implements Serializable {
 		this.enableInstructorCommand = enableInstructorCommand;
 	}
 
+	/**
+	 * Gets if consumer CSS style must be ignored.
+	 *
+	 * @return true if enabled
+	 */
+	public boolean isIgnoreConsumerCss() {
+		return ignoreConsumerCss;
+	}
+
+	/**
+	 * Sets if consumer CSS style must be ignored.
+	 *
+	 * @param ignoreConsumerCss new value
+	 */
+	public void setIgnoreConsumerCss(boolean ignoreConsumerCss) {
+		this.ignoreConsumerCss = ignoreConsumerCss;
+	}
+	
 	/**
 	 * Gets the value of the <code>accept</code> attribute of the input of type file.
 	 *
@@ -432,6 +460,24 @@ public class ToolUiConfig implements Serializable {
 	 */
 	public void setMaxAttemptsDependsOnFilenames(boolean maxAttemptsDependsOnFilenames) {
 		this.maxAttemptsDependsOnFilenames = maxAttemptsDependsOnFilenames;
+	}
+
+	/**
+	 * Gets if it should ask for the delivery password before showing the page.
+	 * 
+	 * @return if it should ask for it first
+	 */
+	public boolean isPasswordProtected() {
+		return passwordProtected;
+	}
+
+	/**
+	 * Sets if it should ask for the delivery password before showing the page.
+	 * 
+	 * @param passwordProtected new value
+	 */
+	public void setPasswordProtected(boolean passwordProtected) {
+		this.passwordProtected = passwordProtected;
 	}
 
 	/**

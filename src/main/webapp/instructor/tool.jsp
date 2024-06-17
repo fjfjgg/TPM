@@ -66,7 +66,7 @@ if (tool != null && tool.getName() != null) {
 	}
 	//Default CSS
 	String cssPaths = Settings.getDefaultCssPath();
-	if (ts.getConsumer().getCssPath()!=null && 
+	if (!tui.isIgnoreConsumerCss() && ts.getConsumer().getCssPath()!=null && 
 			!ts.getConsumer().getCssPath().isEmpty()) {
 		cssPaths = ts.getConsumer().getCssPath();
 	}
@@ -167,33 +167,33 @@ if (tool != null && tool.getName() != null) {
 							</fieldset>
 							<fieldset id="instructor" class="infocontainer" data-toggle="parentinstructor">
 								<legend><fmt:message key="T_INFO_PROFESOR"/></legend>
-							<p id="tool"><label><fmt:message key="T_HERRAMIENTA"/>:</label> ${e:forHtml(ts.tool.name)}</p>
-							<p id="passt"><label><fmt:message key="T_CLAVE_ENTREGA"/>:</label> <span id="instructorpass">${e:forHtml(ts.tool.deliveryPassword)}</span></p>
-						    <p id="outcome"><label><fmt:message key="T_SUBIR_NOTA"/>:</label> ${ts.outcomeAllowed ? text['T_SI'] : text['T_NO']}</p>
-						    <p id="counter"><label><fmt:message key="T_CONTADOR_USO"/>:</label> ${ts.tool.counter }</p>
-						    <%
-						    if (!tool.isEnabled() || !ts.getToolKey().isEnabled()) {
-								out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA") + "</p>");
-							} else {
-								if (tool.getEnabledFrom() != null) { %>
-							<p id="enabledFrom" class='textCentered'><label><fmt:message key="T_HABILITADA_DESDE"/>: </label> <fmt:formatDate type="both" value="${ts.tool.enabledFrom.time}"/></p>
-								<% }
-								if (tool. getEnabledUntil() != null) { %>
-							<p id="enabledUntil" class='textCentered'><label><fmt:message key="T_HABILITADA_HASTA"/>: </label> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/></p>
-								<% }
-								if (!tool.isEnabledByDate()) {
-									out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA_FECHA") + "</p>");
-								}
-						    }
-						    if (tui.isEnableInstructorCommand()) {
-						    %>
-						    <p class="textCentered" id="show">+</p>
-						    <div id="divComando" class="hidden">
-						    	<p>${text.T_ENVIAR_COMANDO}:</p>
-						    	<textarea id="command" cols="70"></textarea>
-						    	<button id="sendComamnd" class="genericButton"><span class="material-icons">send</span></button>
-						    </div>
-						    <% } %>
+								<p id="tool"><label><fmt:message key="T_HERRAMIENTA"/>:</label> ${e:forHtml(ts.tool.name)}</p>
+								<p id="passt"><label><fmt:message key="T_CLAVE_ENTREGA"/>:</label> <span id="instructorpass">${e:forHtml(ts.tool.deliveryPassword)}</span></p>
+							    <p id="outcome"><label><fmt:message key="T_SUBIR_NOTA"/>:</label> ${ts.outcomeAllowed ? text['T_SI'] : text['T_NO']}</p>
+							    <p id="counter"><label><fmt:message key="T_CONTADOR_USO"/>:</label> ${ts.tool.counter }</p>
+							    <%
+							    if (!tool.isEnabled() || !ts.getToolKey().isEnabled()) {
+									out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA") + "</p>");
+								} else {
+									if (tool.getEnabledFrom() != null) { %>
+								<p id="enabledFrom" class='textCentered'><label><fmt:message key="T_HABILITADA_DESDE"/>: </label> <fmt:formatDate type="both" value="${ts.tool.enabledFrom.time}"/></p>
+									<% }
+									if (tool. getEnabledUntil() != null) { %>
+								<p id="enabledUntil" class='textCentered'><label><fmt:message key="T_HABILITADA_HASTA"/>: </label> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/></p>
+									<% }
+									if (!tool.isEnabledByDate()) {
+										out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA_FECHA") + "</p>");
+									}
+							    }
+							    if (tui.isEnableInstructorCommand()) {
+							    %>
+							    <p class="textCentered" id="show">+</p>
+							    <div id="divComando" class="hidden">
+							    	<p>${text.T_ENVIAR_COMANDO}:</p>
+							    	<textarea id="command" cols="70"></textarea>
+							    	<button id="sendComamnd" class="genericButton"><span class="material-icons">send</span></button>
+							    </div>
+							    <% } %>
 							</fieldset>
 							<%if (tui.isShowAttempts() || tui.isManageAttempts()) { %>
 								<fieldset id="attempts" class="infocontainer hidden" data-toggle="parentattempts">
@@ -236,7 +236,7 @@ if (tool != null && tool.getName() != null) {
 									<%if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty()) { %>
 									<p>	
 										<fmt:message key="T_CLAVE_ENTREGA"/>: 
-										<input type="password" id="password" autocomplete="off" />
+										<input type="password" id="password" autocomplete="off" required value="${ts.tool.deliveryPassword}"/>
 									</p>
 									<%} %>
 									<p>

@@ -67,7 +67,7 @@ if (tool != null && tool.getName() != null) {
 	}
 	//Default CSS
 	String cssPaths = Settings.getDefaultCssPath();
-	if (ts.getConsumer().getCssPath()!=null && 
+	if (!tui.isIgnoreConsumerCss() && ts.getConsumer().getCssPath()!=null && 
 			!ts.getConsumer().getCssPath().isEmpty()) {
 		cssPaths = ts.getConsumer().getCssPath();
 	}
@@ -133,6 +133,30 @@ if (tool != null && tool.getName() != null) {
 							%>
 						</div>
 						<div id="containerdiv" class="container clearfix">
+							<%
+							if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty() && tui.isPasswordProtected()
+									&& !tool.getDeliveryPassword().equals(request.getParameter("password"))) {
+							%>
+							<div>
+								<form id="fsdelivery" action="" method="post">
+									<input type="hidden" name="launchId" value="${ts.launchId}" />
+									<% if (request.getParameter("password")!=null) { %>
+										<p><fmt:message key="T_ERROR_AUTORIZACION"/></p>
+									<% } %>
+									<p>
+										<input type="password" name="password" autocomplete="off"
+											placeholder="<fmt:message key="T_CLAVE_ENTREGA"/>" required autofocus/>
+									</p>
+									<p>
+										<button class="genericButton">
+											<span class="material-icons">send</span>
+										</button>
+									</p>
+								</form>
+							</div>	
+							<%
+							} else {
+							%>
 							<fieldset id="description" class="infocontainer" data-toggle="parentdescription">
 								<legend><fmt:message key="T_DESCRIPCION"/></legend>
 								<%
@@ -185,12 +209,17 @@ if (tool != null && tool.getName() != null) {
 									<fmt:message key="T_SELECCIONA_ARCHIVO"/>
 									<%} %>
 									<span class="material-icons">plagiarism</span>. <fmt:message key="T_ADVERTENCIA_TAM"/> <%=inputFileSize%>kB.</p>
-									<%if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty()) { %>
+									<%if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty()) { 
+										if (tui.isPasswordProtected()) { %>
+									<input type="hidden" id="password" value="${ts.tool.deliveryPassword}" />
+										<%											
+										} else {
+										%>
 									<p>	
 										<fmt:message key="T_CLAVE_ENTREGA"/>: 
-										<input type="password" id="password" autocomplete="off" />
+										<input type="password" id="password" autocomplete="off" required/>
 									</p>
-									<%} %>
+									<%} }%>
 									<p>
 									<%if (tui.isEnableSendText()) { %>
 									<textarea id="attempttext" rows="10" cols="70"></textarea>
@@ -208,6 +237,9 @@ if (tool != null && tool.getName() != null) {
 							<%} else {%>
 								<input type="hidden" id="launchId" value="${ts.launchId}" />
 							<%}%>
+						<%
+						}
+						%>
 						</div>
 						<p id="plogout" class="">
 							<a id="alogout" title="<fmt:message key="T_SALIR"/>" class="genericButton" href="${ts.ltiReturnUrl}"> <span

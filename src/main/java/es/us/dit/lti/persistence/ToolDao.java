@@ -229,7 +229,7 @@ public class ToolDao {
 	 * SQL statement to get all tool keys of a tool ordered by constraints.
 	 */
 	private static final String SQL_GET_TKS = "SELECT sid, consumer_sid, context_sid, resource_link_sid,"
-			+ " key, secret, enabled, created, updated FROM " + ToolKeyDao.TK_TABLE_NAME + " WHERE tool_sid=? "
+			+ " key, secret, address, enabled, created, updated FROM " + ToolKeyDao.TK_TABLE_NAME + " WHERE tool_sid=? "
 			+ " ORDER BY consumer_sid NULLS FIRST," + "   context_sid NULLS FIRST,"
 			+ "   resource_link_sid NULLS FIRST";
 
@@ -262,7 +262,7 @@ public class ToolDao {
 			+ "enabled=?,enabled_from=?,enabled_until=?,outcome=?,extra_args=?,type=?,json_config=?,name=?,updated=? WHERE name=?";
 
 	/**
-	 * SQL statement to DELETE resource Users without attempts of a tool
+	 * SQL statement to DELETE resource Users without attempts of a tool.
 	 */
 	private static final String SQL_DELETE_RESOURCE_USERS_WITHOUT_ATTEMPTS = "DELETE FROM "
 			+ ToolResourceUserDao.RU_TABLE_NAME + " WHERE " + ToolResourceUserDao.RU_TABLE_NAME + ".sid IN ( SELECT "
@@ -1287,10 +1287,11 @@ public class ToolDao {
 
 				currentTk.setKey(rs.getString(5));
 				currentTk.setSecret(rs.getString(6));
-				currentTk.setEnabled(rs.getBoolean(7));
+				currentTk.setAddress(rs.getString(7));
+				currentTk.setEnabled(rs.getBoolean(8));
 
-				currentTk.setCreated(DaoUtil.toCalendar(rs.getTimestamp(8)));
-				currentTk.setUpdated(DaoUtil.toCalendar(rs.getTimestamp(9)));
+				currentTk.setCreated(DaoUtil.toCalendar(rs.getTimestamp(9)));
+				currentTk.setUpdated(DaoUtil.toCalendar(rs.getTimestamp(10)));
 				// Match or add
 				boolean found = false;
 				if (lastTk != null) {
@@ -1304,6 +1305,7 @@ public class ToolDao {
 							lastTk.setEnabled(currentTk.isEnabled());
 							lastTk.setKey(currentTk.getKey());
 							lastTk.setSecret(currentTk.getSecret());
+							lastTk.setAddress(currentTk.getAddress());
 							lastTk.setCreated(currentTk.getCreated());
 							lastTk.setUpdated(currentTk.getUpdated());
 							// get next

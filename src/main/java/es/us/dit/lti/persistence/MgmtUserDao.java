@@ -447,7 +447,7 @@ public class MgmtUserDao {
 	/**
 	 * Update a record (without update the password).
 	 *
-	 * @param mgmtUser record data
+	 * @param user record data
 	 * @return true if successful
 	 */
 	public static synchronized boolean update(MgmtUser user) {

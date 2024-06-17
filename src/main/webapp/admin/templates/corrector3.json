@@ -17,7 +17,7 @@
       "literal": true
     },
     {
-      "key": "consumerId",
+      "key": "userId",
       "value": "${0}",
       "literal": false
     },

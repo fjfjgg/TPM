@@ -33,6 +33,7 @@
 		<input type="hidden" id="launchId" name="launchId" value="${launchId}" />
 		<div class="scroll70">
 			<div class="keyfields">
+				<span></span>
 				<!-- LTI users -->
 				<div>
 					<span class="keyTitle">
@@ -64,6 +65,7 @@
 				</div>
 				<div><span class="keyTitle" id="resourceLinks-count">0</span></div>
 				
+				<span></span>
 				<!-- Contexts -->
 				<div>
 					<span class="keyTitle">

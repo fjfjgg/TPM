@@ -117,6 +117,10 @@ async function saveKeyEditor(e) {
 		if (aux) {
 			urlParams.append("link", aux);
 		}
+		aux = document.getElementById("formAddress").value;
+		if (aux) {
+			urlParams.append("address", aux);
+		}
 		fetch('editkey', {
 			method: 'POST',
 			headers: {
@@ -184,6 +188,7 @@ function actualiza(rowId, action) {
 	document.getElementById("formConsumer").value = document.getElementById("consumer-" + rowId).textContent;
 	document.getElementById("formContext").value = document.getElementById("context-" + rowId).textContent;
 	document.getElementById("formResourceLink").value = document.getElementById("rl-" + rowId).textContent;
+	document.getElementById("formAddress").value = document.getElementById("address-" + rowId).title;
 	centerDiv(document.getElementById('src-modal'));
 }
 

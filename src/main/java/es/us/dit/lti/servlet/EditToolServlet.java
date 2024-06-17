@@ -114,6 +114,8 @@ public class EditToolServlet extends HttpServlet {
 			String resMsg = null;
 			if (doCreate && sessionUser.getAdmin()) {
 				resMsg = createTool(sessionUser, paramTool, iter);
+				if (resMsg.equals("T_HERRAMIENTA_CREADA"))
+					session.setAttribute("lasttool", paramTool.getName());
 			} else if (!doCreate) {
 				resMsg = updateTool(sessionUser, paramTool, iter);
 			}

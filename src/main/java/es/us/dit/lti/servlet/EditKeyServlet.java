@@ -22,6 +22,9 @@ package es.us.dit.lti.servlet;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -90,7 +93,8 @@ public class EditKeyServlet extends HttpServlet {
 		final String consumerGuid = request.getParameter("consumer");
 		final String contextId = request.getParameter("context");
 		final String resourceLinkId = request.getParameter("link");
-
+		final String address = request.getParameter("address");
+		
 		ToolKey old = null;
 		if (oldKey != null) {
 			old = ToolKeyDao.get(oldKey, false);
@@ -122,9 +126,9 @@ public class EditKeyServlet extends HttpServlet {
 				key = tool.getName() + "_" + key;
 				if (old != null) {
 					// edit
-					editKey(response, key, secret, enabled, old);
+					editKey(response, key, secret, address, enabled, old);
 				} else {
-					createKey(response, key, secret, enabled, consumerGuid, contextId, resourceLinkId, tool);
+					createKey(response, key, secret, address, enabled, consumerGuid, contextId, resourceLinkId, tool);
 				}
 
 			} else {
@@ -141,6 +145,7 @@ public class EditKeyServlet extends HttpServlet {
 	 * @param response       the HTTP response
 	 * @param key            the consumer key
 	 * @param secret         the secret
+	 * @param address		 the address regex
 	 * @param enabled        if key is enabled
 	 * @param consumerGuid   the consumer GUID (constraint)
 	 * @param contextId      the context ID (constraint)
@@ -148,12 +153,13 @@ public class EditKeyServlet extends HttpServlet {
 	 * @param tool           the tool
 	 * @throws IOException if HTTP response can not be written
 	 */
-	private void createKey(HttpServletResponse response, String key, String secret, boolean enabled,
+	private void createKey(HttpServletResponse response, String key, String secret, String address, boolean enabled,
 			String consumerGuid, String contextId, String resourceLinkId, Tool tool) throws IOException {
 		// new
 		final ToolKey tk = new ToolKey();
 		tk.setKey(key);
 		tk.setSecret(secret);
+		tk.setAddress(address);
 		tk.setEnabled(enabled);
 		tk.setTool(tool);
 
@@ -181,6 +187,10 @@ public class EditKeyServlet extends HttpServlet {
 		if (validated) {
 			// create
 			try {
+				// test pattern
+				if (address != null && !address.isBlank()) {
+					Pattern.matches(address, ""); //ignore return value
+				}
 				if (ToolKeyDao.create(tk)) {
 					response.getWriter().append("Creada");
 				} else {
@@ -189,6 +199,9 @@ public class EditKeyServlet extends HttpServlet {
 				}
 			} catch (final FileAlreadyExistsException e) {
 				response.getWriter().append("La clave ya existe y no puede estar repetida");
+				response.setStatus(HttpServletResponse.SC_CONFLICT);
+			} catch (final PatternSyntaxException e) {
+				response.getWriter().append("El patrón de dirección no es válido");
 				response.setStatus(HttpServletResponse.SC_CONFLICT);
 			}
 		} else {
@@ -225,21 +238,28 @@ public class EditKeyServlet extends HttpServlet {
 	 * @param response the HTTP response
 	 * @param key      the consumer key
 	 * @param secret   the secret
+	 * @param address		 the address regex
 	 * @param enabled  it tool key is enabled
 	 * @param old      old tool key data
 	 * @throws IOException if HTTP response can not be written
 	 */
-	private void editKey(HttpServletResponse response, String key, String secret, boolean enabled, ToolKey old)
-			throws IOException {
-		if (old.getKey().equals(key) && old.getSecret().equals(secret) && old.isEnabled() == enabled) {
+	private void editKey(HttpServletResponse response, String key, String secret, String address, boolean enabled,
+			ToolKey old) throws IOException {
+		if (old.getKey().equals(key) && old.getSecret().equals(secret) && old.isEnabled() == enabled
+				&& Objects.equals(old.getAddress(),address)) {
 			// no changes
 			response.getWriter().append("Ignorada");
 		} else {
 			old.setKey(key);
 			old.setSecret(secret);
+			old.setAddress(address);
 			old.setEnabled(enabled);
 			// restrictions are ignored, not allowed
 			try {
+				// test pattern
+				if (address != null && !address.isBlank()) {
+					Pattern.matches(address, ""); //ignore return value
+				}
 				if (ToolKeyDao.update(old)) {
 					response.getWriter().append("Editada");
 				} else {
@@ -248,6 +268,9 @@ public class EditKeyServlet extends HttpServlet {
 				}
 			} catch (final FileAlreadyExistsException e) {
 				response.getWriter().append("La clave ya existe y no puede estar repetida");
+				response.setStatus(HttpServletResponse.SC_CONFLICT);
+			} catch (final PatternSyntaxException e) {
+				response.getWriter().append("El patrón de dirección no es válido");
 				response.setStatus(HttpServletResponse.SC_CONFLICT);
 			}
 		}

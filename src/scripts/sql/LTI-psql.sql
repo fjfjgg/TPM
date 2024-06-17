@@ -69,6 +69,7 @@ CREATE TABLE "tool_key" (
   "resource_link_sid" integer,
   "key" varchar(50) UNIQUE NOT NULL,
   "secret" varchar(255) NOT NULL,
+  "address" varchar(255),
   "enabled" boolean DEFAULT TRUE,
   "created" integer NOT NULL,
   "updated" integer NOT NULL

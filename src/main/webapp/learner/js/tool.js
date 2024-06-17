@@ -11,7 +11,8 @@ let TEXTS = {
 		"errorNoFile": 'Debe seleccionar un archivo',
 		"errorClosedSession": "La sesión se ha cerrado. Vuelva a iniciar la herramienta.",
 		"errorNoResponse": "El servidor no responde. Reinténtelo más tarde.",
-		"errorRequest": "Error en la petición. Puede que el archivo sea demasiado grande o el servidor no esté operativo."
+		"errorRequest": "Error en la petición. Puede que el archivo sea demasiado grande o el servidor no esté operativo.",
+		"closeWindow": "Puede cerrar esta ventana/pestaña ahora."
 	},
 	"en": {
 		"waitMsg": "Please wait while your work is uploaded and evaluated...",
@@ -24,7 +25,8 @@ let TEXTS = {
 		"errorNoFile": 'You must select a file',
 		"errorClosedSession": "The session has been closed. Restart the tool.",
 		"errorNoResponse": "The server does not respond. Try again later.",
-		"errorRequest": "Error in the request. The file may be too large or the server may not be operational."
+		"errorRequest": "Error in the request. The file may be too large or the server may not be operational.",
+		"closeWindow": "You can close this window/tab now."
 	}
 }
 let texts = TEXTS.es;
@@ -280,7 +282,7 @@ window.addEventListener("load", function() {
 			let x = setInterval(function() {
 				let now = new Date().getTime();
 				let distance = (startDate.getTime() + timeLeft - now) / 1000;
-				let hours = Math.floor((distance % (60 * 60 * 24)) / (60 * 60));
+				let hours = Math.floor(distance / (60 * 60));
 				let minutes = Math.floor((distance % (60 * 60)) / 60);
 				let seconds = Math.floor(distance % 60);
 				if (hours > 6) {
@@ -305,7 +307,7 @@ window.addEventListener("load", function() {
 	}
 });
 
-function logout() {
+function logout(event) {
 	let xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange = function() {
 		if (xmlhttp.readyState == 4) {
@@ -316,4 +318,8 @@ function logout() {
 	xmlhttp.send();
 	//try to close windows
 	window.close();
+	if (this.getAttribute("href")=="") {
+		event.preventDefault();
+		document.write(texts.closeWindow);
+	}
 }

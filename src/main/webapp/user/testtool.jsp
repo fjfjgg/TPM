@@ -40,7 +40,8 @@ if (permisos <= MgmtUserType.TESTER.getCode()
 	ts.initTest(tool, (String) session.getAttribute("launchId"), 
 			sessionUser, text.get("T_PAGINA_PRUEBAS"),
 			request.getParameter("learner")!=null, 
-			request.getParameter("instructor")!=null);
+			request.getParameter("instructor")!=null,
+			request.getRemoteAddr());
 		
 	session.setAttribute(ToolSession.class.getName(), ts);
 	

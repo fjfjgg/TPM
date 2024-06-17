@@ -208,7 +208,7 @@ input[type="button"]:disabled, input[type="submit"]:disabled, button:disabled
 
 .keyfields {
 	display: grid;
-	grid-template-columns: auto auto auto auto auto auto;
+	grid-template-columns: auto auto auto auto auto auto auto;
 	grid-column-gap: 10px;
 }
 
@@ -415,6 +415,10 @@ select {
 	border-radius: 10px;
 	padding: 5px;
 	width: 90%;
+}
+
+.hidden {
+	display: none;
 }
 
 @media only screen and (max-width: 700px) {

@@ -53,9 +53,10 @@
 		<div class="keyfields">
 			<div><strong>Clave y<br />Secreto</strong></div>
 			<div title="Permitido o bloqueado"><strong><span class="material-icons">flaky</span></strong></div>
-			<div><strong>Restricción de <br />consumidor</strong></div>
-			<div><strong>Restricción de <br />contexto</strong></div>
-			<div><strong>Restricción de <br />enlace</strong></div>
+			<div title="Consumidor al que se restringe esta clave"><strong>Consumidor</strong></div>
+			<div title="Contexto al que se restringe esta clave"><strong>Contexto</strong></div>
+			<div title="Enlace al que se restringe esta clave"><strong>Enlace</strong></div>
+			<div title="Expresión regular de la IP remota a la que se restringe esta clave"><strong>IP</strong></div>
 			<div><strong></strong></div>
 		
 			<c:forEach items="${list}" var="tk" varStatus="row">
@@ -85,6 +86,11 @@
 			<div>
 				<span class="keyId" id="rl-${row.index}"><e:forHtml value="${ tk.resourceLink.resourceId }" /></span><br />
 				<span class="keyTitle"><e:forHtml value="${ tk.resourceLink.title }" /></span>
+			</div>
+			
+			<div>
+				<span id="address-${row.index}" class="material-icons ${empty tk.address ? 'hidden' : ''}" 
+					title="${tk.address}">lan</span>				
 			</div>
 			
 			<div>
@@ -132,7 +138,9 @@
 					
 					<div id="resourceLink" title="Enlace al que se restringe esta clave">Enlace</div>
 					<div><input type="text" id="formResourceLink" value="" disabled="disabled" /></div>
-					
+
+					<div id="address" title="Expresión regular de la IP remota a la que se restringe esta clave">Patrón de dirección remota</div>
+					<div><input type="text" id="formAddress" value="" /></div>
 				</div>
 			</div>
 			<div class="centrado">

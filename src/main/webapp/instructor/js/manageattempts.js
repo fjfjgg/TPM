@@ -86,9 +86,9 @@ function reassess(event) {
 	event.preventDefault();
 	let launchId = document.getElementById("launchId").value;
 
-	let pPassword = document.getElementById("password");
+	let pPassword = document.getElementById("instructorpass");
 	if (pPassword)
-		pPassword = pPassword.value;
+		pPassword = pPassword.textContent;
 
 	let formData = new FormData();
 	formData.append("launchId", launchId);

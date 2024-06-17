@@ -124,4 +124,9 @@ legend
   width: 90%;
 }
 
+#containerdiv ul, #containerdiv ol {
+  padding-inline-start: revert; 
+  list-style: revert;
+  margin-bottom: 5px;
+}
 

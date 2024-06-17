@@ -312,5 +312,7 @@ function showOutput(event) {
 }
 
 window.addEventListener("load", function() {
-	document.getElementById("showattempts").onclick = showAttempts; 
+  let elem = document.getElementById("showattempts");
+  if (elem)
+    document.getElementById("showattempts").onclick = showAttempts; 
 });

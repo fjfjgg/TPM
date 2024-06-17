@@ -239,8 +239,8 @@ window.addEventListener("load", function() {
 	u = document.getElementById("type");
 	if (u) {
 		u.onchange=changeType;
+		changeType.bind(u).call();
 	}
-	changeType.bind(u).call();
 	u = document.getElementById("enabledFrom");
 	let uTs = document.getElementById("enabledFromTs");
 	if (u && uTs) {

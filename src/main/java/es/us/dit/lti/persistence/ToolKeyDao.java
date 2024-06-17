@@ -56,20 +56,20 @@ public class ToolKeyDao {
 	 * SQL statement to get a tool key by the (consumer) key.
 	 */
 	public static final String SQL_GET_BY_ID = "SELECT sid, tool_sid, consumer_sid, context_sid, resource_link_sid,"
-			+ " key, secret, enabled, created, updated FROM " + TK_TABLE_NAME + " WHERE key=?";
+			+ " key, secret, address, enabled, created, updated FROM " + TK_TABLE_NAME + " WHERE key=?";
 
 	/**
 	 * SQL statement to add a tool key.
 	 */
 	public static final String SQL_NEW = "INSERT INTO " + TK_TABLE_NAME
-			+ "(tool_sid, consumer_sid, context_sid, resource_link_sid, key, secret, enabled, created, updated) VALUES "
-			+ "(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "(tool_sid, consumer_sid, context_sid, resource_link_sid, key, secret, address, enabled, created, updated) VALUES "
+			+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	/**
 	 * SQL statement to update a tool key.
 	 */
 	public static final String SQL_UPDATE = "UPDATE " + TK_TABLE_NAME
-			+ " SET key=?, secret=?, enabled=?, updated=? WHERE sid=?";
+			+ " SET key=?, secret=?, address=?, enabled=?, updated=? WHERE sid=?";
 
 	/**
 	 * SQL statement to delete a tool key.
@@ -86,13 +86,13 @@ public class ToolKeyDao {
 	 * SQL statement to get a tool key by the serial ID.
 	 */
 	public static final String SQL_GET_BY_SID = "SELECT sid, tool_sid, consumer_sid, context_sid, resource_link_sid,"
-			+ " key, secret, enabled, created, updated FROM " + TK_TABLE_NAME + " WHERE sid=?";
+			+ " key, secret, address, enabled, created, updated FROM " + TK_TABLE_NAME + " WHERE sid=?";
 
 	/**
 	 * SQL statement to get a default tool key (without constraints) for a specific
 	 * tool.
 	 */
-	public static final String SQL_GET_DEFAULT = "SELECT sid, key, secret, enabled, created, updated FROM "
+	public static final String SQL_GET_DEFAULT = "SELECT sid, key, secret, address, enabled, created, updated FROM "
 			+ TK_TABLE_NAME + " WHERE tool_sid=? AND consumer_sid is NULL";
 
 	/**
@@ -197,10 +197,11 @@ public class ToolKeyDao {
 			}
 			stmt.setString(5, tk.getKey());
 			stmt.setString(6, tk.getSecret());
-			stmt.setBoolean(7, tk.isEnabled());
+			stmt.setString(7, tk.getAddress());
+			stmt.setBoolean(8, tk.isEnabled());
 			final Calendar now = Calendar.getInstance();
-			stmt.setTimestamp(8, DaoUtil.toTimestamp(now));
 			stmt.setTimestamp(9, DaoUtil.toTimestamp(now));
+			stmt.setTimestamp(10, DaoUtil.toTimestamp(now));
 			stmt.executeUpdate();
 
 		} catch (final Exception ex) {
@@ -243,9 +244,10 @@ public class ToolKeyDao {
 		try (PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE);) {
 			stmt.setString(1, tk.getKey());
 			stmt.setString(2, tk.getSecret());
-			stmt.setBoolean(3, tk.isEnabled());
-			stmt.setTimestamp(4, DaoUtil.toTimestamp(Calendar.getInstance()));
-			stmt.setInt(5, tk.getSid());
+			stmt.setString(3, tk.getAddress());
+			stmt.setBoolean(4, tk.isEnabled());
+			stmt.setTimestamp(5, DaoUtil.toTimestamp(Calendar.getInstance()));
+			stmt.setInt(6, tk.getSid());
 			stmt.executeUpdate();
 		} catch (final SQLException e) {
 			logger.error("Error updating tool key.", e);
@@ -359,7 +361,7 @@ public class ToolKeyDao {
 						if (r.getTool().getSid() == result.getTool().getSid()) {
 							r.setTool(result.getTool());
 						}
-						if (r.getContext().getSid() == result.getContext().getSid()) {
+						if (result.getContext() != null && r.getContext().getSid() == result.getContext().getSid()) {
 							r.setContext(result.getContext());
 						}
 						result.setResourceLink(r);
@@ -369,10 +371,11 @@ public class ToolKeyDao {
 
 				result.setKey(rs.getString(6));
 				result.setSecret(rs.getString(7));
-				result.setEnabled(rs.getBoolean(8));
+				result.setAddress(rs.getString(8));
+				result.setEnabled(rs.getBoolean(9));
 
-				result.setCreated(DaoUtil.toCalendar(rs.getTimestamp(9)));
-				result.setUpdated(DaoUtil.toCalendar(rs.getTimestamp(10)));
+				result.setCreated(DaoUtil.toCalendar(rs.getTimestamp(10)));
+				result.setUpdated(DaoUtil.toCalendar(rs.getTimestamp(11)));
 			}
 			rs.close();
 
@@ -427,10 +430,11 @@ public class ToolKeyDao {
 
 				result.setKey(rs.getString(6));
 				result.setSecret(rs.getString(7));
-				result.setEnabled(rs.getBoolean(8));
+				result.setAddress(rs.getString(8));
+				result.setEnabled(rs.getBoolean(9));
 
-				result.setCreated(DaoUtil.toCalendar(rs.getTimestamp(9)));
-				result.setUpdated(DaoUtil.toCalendar(rs.getTimestamp(10)));
+				result.setCreated(DaoUtil.toCalendar(rs.getTimestamp(10)));
+				result.setUpdated(DaoUtil.toCalendar(rs.getTimestamp(11)));
 			}
 			rs.close();
 
@@ -461,9 +465,10 @@ public class ToolKeyDao {
 				result.setTool(tool);
 				result.setKey(rs.getString(2));
 				result.setSecret(rs.getString(3));
-				result.setEnabled(rs.getBoolean(4));
-				result.setCreated(DaoUtil.toCalendar(rs.getTimestamp(5)));
-				result.setUpdated(DaoUtil.toCalendar(rs.getTimestamp(6)));
+				result.setAddress(rs.getString(4));
+				result.setEnabled(rs.getBoolean(5));
+				result.setCreated(DaoUtil.toCalendar(rs.getTimestamp(6)));
+				result.setUpdated(DaoUtil.toCalendar(rs.getTimestamp(7)));
 			}
 			rs.close();
 

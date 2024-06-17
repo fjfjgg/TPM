@@ -72,6 +72,12 @@ public class ToolKey extends UpdateRecordEntity {
 	 */
 	private String secret;
 	/**
+	 * Regex of remote IP address to which the tool key is restricted.
+	 * 
+	 * <p>If it is null, there is no constraint. 
+	 */
+	private String address;
+	/**
 	 * If enabled, requests with this tool key are allowed.
 	 */
 	private boolean enabled;
@@ -246,6 +252,24 @@ public class ToolKey extends UpdateRecordEntity {
 	 */
 	public void setSecret(String secret) {
 		this.secret = secret;
+	}
+
+	/**
+	 * Gets the address regex.
+	 * 
+	 * @return the address regex
+	 */
+	public String getAddress() {
+		return address;
+	}
+
+	/**
+	 * Sets the address regex.
+	 * 
+	 * @param address the address regex to set
+	 */
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	/**

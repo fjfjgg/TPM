@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -685,9 +687,10 @@ public final class ToolSession implements Serializable {
 		final String contextId = request.getParameter("context_id").trim();
 		final String resourceLinkId = request.getParameter("resource_link_id").trim();
 		final String ltiKey = request.getParameter("oauth_consumer_key").trim();
-		if (!loadToolKey(ltiKey, consumerGuid, contextId, resourceLinkId)) {
+		if (!loadToolKey(ltiKey, consumerGuid, contextId, resourceLinkId, request.getRemoteAddr())) {
 			error = "T_LTI_PROHIBIDO";
-			logger.error("Key does not exist, is not allowed or is not enabled: {}", ltiKey);
+			logger.error("Key does not exist, is not allowed or is not enabled: {}. Remote address: {}",
+					ltiKey, request.getRemoteAddr());
 			return valid;
 		}
 
@@ -939,19 +942,30 @@ public final class ToolSession implements Serializable {
 	 * @param consumerGuid   consumer GUID of tool session
 	 * @param contextId      context ID of tool session
 	 * @param resourceLinkId resource link ID of tool session
+	 * @param remoteAddress	 remote address of tool session
 	 * @return true if the took key is found and valid for the tool session
 	 */
-	private boolean loadToolKey(String key, String consumerGuid, String contextId, String resourceLinkId) {
+	private boolean loadToolKey(String key, String consumerGuid, String contextId, String resourceLinkId,
+			String remoteAddress) {
 		// Search key with associate objects
 		final ToolKey tk = ToolKeyDao.get(key, false); // lazy = false
 
-		// Check if key and tool are enabled and Check if origin is allowed
-		if (tk != null && tk.isEnabled() && tk.getTool().isEnabled()
-				&& (tk.getConsumer() == null || consumerGuid.equals(tk.getConsumer().getGuid()))
-				&& (tk.getContext() == null || contextId.equals(tk.getContext().getContextId()))
-				&& (tk.getResourceLink() == null || resourceLinkId.equals(tk.getResourceLink().getResourceId()))) {
-			toolKey = tk;
-			tool = tk.getTool();
+		try {
+			// Check if key and tool are enabled and Check if origin is allowed
+			if (tk != null && tk.isEnabled() && tk.getTool().isEnabled()
+					&& (tk.getConsumer() == null || consumerGuid.equals(tk.getConsumer().getGuid()))
+					&& (tk.getContext() == null || contextId.equals(tk.getContext().getContextId()))
+					&& (tk.getResourceLink() == null || resourceLinkId.equals(tk.getResourceLink().getResourceId()))
+					&& (tk.getAddress() == null || tk.getAddress().isBlank()
+							|| Pattern.matches(tk.getAddress(), remoteAddress))) {
+				toolKey = tk;
+				tool = tk.getTool();
+			}
+		} catch (final PatternSyntaxException e) {
+			// Not allowed
+			logger.error("Invalid address pattern: {}", tk.getAddress());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return toolKey != null;
@@ -1078,16 +1092,17 @@ public final class ToolSession implements Serializable {
 	/**
 	 * Initializes a bogus tool session for a management user.
 	 *
-	 * @param tool        target tool
-	 * @param launchId    random ID to use
-	 * @param sessionUser username
-	 * @param title       title of context
-	 * @param learner     if it is a learner session
-	 * @param instructor  if it is a instructor session
+	 * @param tool          target tool
+	 * @param launchId      random ID to use
+	 * @param sessionUser   username
+	 * @param title         title of context
+	 * @param learner       if it is a learner session
+	 * @param instructor    if it is a instructor session
+	 * @param remoteAddress remote address of tool session
 	 * @return if it is valid
 	 */
 	public boolean initTest(Tool tool, String launchId, String sessionUser, String title, boolean learner,
-			boolean instructor) {
+			boolean instructor, String remoteAddress) {
 
 		final String consumerGuid = "test";
 		final String contextId = "test";
@@ -1101,6 +1116,17 @@ public final class ToolSession implements Serializable {
 			if (toolKey == null) {
 				toolKey = new ToolKey();
 			}
+		}
+		// Test address restriction
+		try {
+			if (toolKey.getAddress() != null && !toolKey.getAddress().isBlank()
+					&& !Pattern.matches(toolKey.getAddress(), remoteAddress)) {
+				logger.error("The remote address is not allowed: {}", remoteAddress);
+				return valid;
+			}
+		} catch (final PatternSyntaxException e) {
+			// Not allowed
+			logger.error("Invalid address pattern: {}", toolKey.getAddress());
 		}
 		if (toolKey.getTool() != null) {
 			this.tool = toolKey.getTool(); // Simulate real session
@@ -1163,7 +1189,7 @@ public final class ToolSession implements Serializable {
 			resourceLink = toolKey.getResourceLink();
 		} else {
 			final Integer toolSid = this.tool.getSid();
-			final Integer contextSid = context == null ? null : context.getSid();
+			final Integer contextSid = context.getSid();
 			resourceLink = ToolResourceLinkDao.getById(toolSid, contextSid, resourceLinkId);
 		}
 		if (toolKey.getSid() == 0 && (resourceLink == null || resourceLink.getToolKey() == null)) {
@@ -1212,7 +1238,7 @@ public final class ToolSession implements Serializable {
 			resourceLink.setTool(tool);
 			if (resourceLink.getToolKey() == null
 					|| (resourceLink.getToolKey() != null && toolKey.getSid() != resourceLink.getToolKey().getSid())) {
-				// Actualizar
+				// Update
 				resourceLink.setToolKey(toolKey);
 				ToolResourceLinkDao.update(resourceLink);
 				logger.info("Resource Link updated: {}", resourceLink.getResourceId());

@@ -118,6 +118,7 @@ public class ListAttemptsServlet extends HttpServlet {
 			final ToolUiConfig tui = tool.getToolUiConfig();
 			if (request.getServletPath().startsWith("/instructor/users") && tui.isManageAttempts()) {
 				// list of users
+				response.setContentType("application/json");
 				final Gson gson = new GsonBuilder().addSerializationExclusionStrategy(strategyUsers).create();
 				out.append(gson.toJson(getLtiUsers(ts.getToolKey(), tui.getManageAttemptsExcludeUsers())));
 
