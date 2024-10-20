@@ -83,6 +83,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import es.us.dit.lti.config.ExecutionRestrictionsConfig;
 import es.us.dit.lti.entity.Settings;
@@ -710,24 +711,28 @@ public class HttpToolRunner implements ToolRunner {
 	 */
 	private void createJsonReplacements(Map<String, String> replacements, String body) {
 		final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-		final JsonElement json = JsonParser.parseString(body);
-		if (json.isJsonObject()) {
-			final JsonObject jsonObject = json.getAsJsonObject();
-			for (final Map.Entry<String, JsonElement> e : jsonObject.entrySet()) {
-				if (e.getValue().isJsonPrimitive()) {
-					replacements.put("j." + e.getKey(), e.getValue().getAsString());
-				} else {
-					replacements.put("j." + e.getKey(), gson.toJson(e.getValue()));
+		try {
+			final JsonElement json = JsonParser.parseString(body);
+			if (json.isJsonObject()) {
+				final JsonObject jsonObject = json.getAsJsonObject();
+				for (final Map.Entry<String, JsonElement> e : jsonObject.entrySet()) {
+					if (e.getValue().isJsonPrimitive()) {
+						replacements.put("j." + e.getKey(), e.getValue().getAsString());
+					} else {
+						replacements.put("j." + e.getKey(), gson.toJson(e.getValue()));
+					}
 				}
+			} else if (json.isJsonArray()) {
+				final JsonArray jsonArray = json.getAsJsonArray();
+				final int size = jsonArray.size();
+				for (int i = 0; i < size; i++) {
+					replacements.put("j." + i, gson.toJson(jsonArray.get(i)));
+				}
+			} else if (json.isJsonPrimitive()) {
+				replacements.put("j.0", gson.toJson(json));
 			}
-		} else if (json.isJsonArray()) {
-			final JsonArray jsonArray = json.getAsJsonArray();
-			final int size = jsonArray.size();
-			for (int i = 0; i < size; i++) {
-				replacements.put("j." + i, gson.toJson(jsonArray.get(i)));
-			}
-		} else if (json.isJsonPrimitive()) {
-			replacements.put("j.0", gson.toJson(json));
+		} catch (JsonSyntaxException e) {
+			logger.error("JsonSyntaxException: {}\nBody:\n|{}|", e.getMessage(), body);
 		}
 	}
 }
