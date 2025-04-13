@@ -38,7 +38,7 @@ import es.us.dit.lti.entity.Consumer;
  *
  * @author Francisco José Fernández Jiménez
  */
-public class ToolConsumerDao {
+public final class ToolConsumerDao {
 	/**
 	 * Logger.
 	 */

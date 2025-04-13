@@ -28,8 +28,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import es.us.dit.lti.entity.Settings;
-
 /**
  * Storage Runner.
  *
@@ -83,20 +81,4 @@ public class StorageRunner implements ToolRunner {
 
 	}
 
-	/**
-	 * Clean the output files.
-	 *
-	 * @param outputPath output file path.
-	 */
-	@Override
-	public void clean(String outputPath) {
-		final File output = new File(outputPath);
-		final File outputErr = new File(outputPath + Settings.OUTPUT_ERROR_EXT);
-		if (output.exists() && !output.delete()) {
-			logger.error("Error deleting output");
-		}
-		if (outputErr.exists() && !outputErr.delete()) {
-			logger.error("Error deleting output.error");
-		}
-	}
 }

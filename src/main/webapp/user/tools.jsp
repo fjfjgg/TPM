@@ -27,7 +27,7 @@ boolean tieneAdministrados = false;
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
 	<div class="h1container dialog">
 		<h1>
-			<a href="../user/menu.jsp"><span class="material-icons bcerrar">close</span></a>
+			<a href="../user/menu.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 			Herramientas
 		</h1>
 		<% 
@@ -80,15 +80,15 @@ boolean tieneAdministrados = false;
 			<br />
 			<div class="centrado">
 				<% if (mgmtUser.getType() == MgmtUserType.SUPER) {%>
-				<input type='button' id='binfo' value='Información' class="accionp" disabled="disabled"/>
+				<input type='button' id='binfo' value='Información' class="accionp" disabled="disabled" accesskey="i"/>
 				<input type='button' id='bdelete' value='Borrar' class="accionp" disabled="disabled"/>
 				<br />
 				<input type='button' id='bassign' value='Asociar usuarios' class="accionp" disabled="disabled"/>
 				<input type='button' id='bunassign' value='Desasociar' class="accionp" disabled="disabled"/>
 				<% } else if (mgmtUser.getType() == MgmtUserType.ADMIN) {%>
-				<input type='button' id='binfo' value='Información' class="accionp" disabled="disabled"/>
-				<input type='button' id='bkeys' value='Claves' class="accionp" disabled="disabled" />
-				<input type='button' id='bedit' value='Editar' class="accionp" disabled="disabled"/>
+				<input type='button' id='binfo' value='Información' class="accionp" disabled="disabled" accesskey="i"/>
+				<input type='button' id='bkeys' value='Claves' class="accionp" disabled="disabled" accesskey="c"/>
+				<input type='button' id='bedit' value='Editar' class="accionp" disabled="disabled" accesskey="e"/>
 				
 				<input type='button' id='bdelete' value='Borrar' class="accionp" disabled="disabled"/>
 				<input type='button' id='bdeletedata' value='Borrar datos' class="accionp" disabled="disabled"/>
@@ -98,19 +98,19 @@ boolean tieneAdministrados = false;
 				<input type='button' id='bunassign' value='Desasociar' class="accionp" disabled="disabled"/>
 				<input type='button' id='bdisable' value='Deshabilitar sesiones' class="accionp" disabled="disabled"/>
 				
-				<input type='button' id='btest' value='Probar' class="accionp"  /><br />
+				<input type='button' id='btest' value='Probar' class="accionp" accesskey="p"/><br />
 				<% } else if (mgmtUser.getType() == MgmtUserType.EDITOR) {%>
-				<input type='button' id='binfo' value='Información' class="accionp" disabled="disabled"/>
-				<input type='button' id='bkeys' value='Claves' class="accionp" disabled="disabled" />
-				<input type='button' id='bedit' value='Editar' class="accionp" disabled="disabled"/>
+				<input type='button' id='binfo' value='Información' class="accionp" disabled="disabled" accesskey="i"/>
+				<input type='button' id='bkeys' value='Claves' class="accionp" disabled="disabled" accesskey="c"/>
+				<input type='button' id='bedit' value='Editar' class="accionp" disabled="disabled" accesskey="e"/>
 				
 				<input type='button' id='bdownload' value='Descargar' class="accionp" disabled="disabled"/>
 				<input type='button' id='bdeletedata' value='Borrar datos' class="accionp" disabled="disabled"/>
 				<input type='button' id='bdisable' value='Deshabilitar sesiones' class="accionp" disabled="disabled"/>
 				
-				<input type='button' id='btest' value='Probar' class="accionp"  /><br />
+				<input type='button' id='btest' value='Probar' class="accionp" accesskey="p"/><br />
 				<% } else { %>
-				<input type='button' id='btest' value='Probar' class="accionp"  /><br />
+				<input type='button' id='btest' value='Probar' class="accionp" accesskey="p"/><br />
 				<% } %>
 			</div>
 		</form>

@@ -815,7 +815,7 @@ public final class ToolSession implements Serializable {
 		// Custom properties
 		for (final String name : customPropertyNames) {
 			if (request.getParameter(name) != null) {
-				resourceLink.setCustomProperty(name, request.getParameter(name));
+				auxResourceLink.setCustomProperty(name, request.getParameter(name));
 			}
 		}
 		// Check if exist
@@ -1237,7 +1237,7 @@ public final class ToolSession implements Serializable {
 		} else {
 			resourceLink.setTool(tool);
 			if (resourceLink.getToolKey() == null
-					|| (resourceLink.getToolKey() != null && toolKey.getSid() != resourceLink.getToolKey().getSid())) {
+					|| resourceLink.getToolKey() != null && toolKey.getSid() != resourceLink.getToolKey().getSid()) {
 				// Update
 				resourceLink.setToolKey(toolKey);
 				ToolResourceLinkDao.update(resourceLink);

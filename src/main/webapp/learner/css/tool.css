@@ -130,3 +130,16 @@ legend
   margin-bottom: 5px;
 }
 
+.resizer {
+  display: flex;
+  resize: vertical;
+  overflow: auto;
+}
+
+.resizer > .resized { 
+	flex-grow:1;
+	margin:0;
+	padding:0;
+	border:0;
+	width: 100%;
+}

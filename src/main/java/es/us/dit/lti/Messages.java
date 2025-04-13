@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
  * @author Francisco José Fernández Jiménez
  *
  */
-public class Messages {
+public final class Messages {
 
 	/**
 	 * Can not create objects.

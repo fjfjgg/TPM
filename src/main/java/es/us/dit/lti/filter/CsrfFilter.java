@@ -122,7 +122,7 @@ public class CsrfFilter extends HttpFilter implements Filter {
 	 */
 	private boolean isMultipart(HttpServletRequest req) {
 		final String ct = req.getContentType();
-		return (ct != null && ct.toLowerCase(Locale.ENGLISH).startsWith("multipart/"));
+		return ct != null && ct.toLowerCase(Locale.ENGLISH).startsWith("multipart/");
 	}
 
 }

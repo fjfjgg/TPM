@@ -357,18 +357,4 @@ public class SshToolRunner implements ToolRunner {
 
 	}
 
-	/**
-	 * Clean the output files.
-	 */
-	@Override
-	public void clean(String outputPath) {
-		final File output = new File(outputPath);
-		final File outputErr = new File(outputPath + Settings.OUTPUT_ERROR_EXT);
-		if (output.exists() && !output.delete()) {
-			logger.error("Error deleting output");
-		}
-		if (outputErr.exists() && !outputErr.delete()) {
-			logger.error("Error deleting output.error");
-		}
-	}
 }

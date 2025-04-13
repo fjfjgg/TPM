@@ -41,7 +41,7 @@ import es.us.dit.lti.entity.Settings;
  *
  * @author Francisco José Fernández Jiménez
  */
-public class SettingsDao {
+public final class SettingsDao {
 	/**
 	 * Logger.
 	 */
@@ -243,6 +243,7 @@ public class SettingsDao {
 				break;
 			} catch (final SQLException e) {
 				// Ignore, try another
+				logger.error("Error in optimize DB.");
 			} finally {
 				dbUtil.closeConnection(connection);
 			}

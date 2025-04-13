@@ -55,7 +55,7 @@ public class DownloadServlet extends HttpServlet {
 	/**
 	 * Logger.
 	 */
-	private static final Logger logger = LoggerFactory.getLogger(DisassociateServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(DownloadServlet.class);
 	/**
 	 * Buffer size to send response.
 	 */
@@ -84,13 +84,16 @@ public class DownloadServlet extends HttpServlet {
 				if (ToolDao.getToolUserType(sessionUser, tool) <= MgmtUserType.EDITOR.getCode()) {
 					String filename;
 					String path;
-					if (tool != null) {
-						if (type != null && type.equals("corrector")) {
+					if (tool != null && type != null) {
+						if (type.equals("corrector")) {
 							path = tool.getCorrectorPath();
 							filename = toolname + ".run";
-						} else {
+						} else if (type.equals("description")) {
 							path = tool.getDescriptionPath();
 							filename = toolname + ".html";
+						} else {
+							path = tool.getExtraZipPath();
+							filename = toolname + "_extra.zip";
 						}
 						doDownloadFile(filename, path, response);
 					}

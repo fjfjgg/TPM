@@ -41,7 +41,7 @@ import es.us.dit.lti.entity.ToolKey;
  *
  * @author Francisco José Fernández Jiménez
  */
-public class ToolResourceLinkDao {
+public final class ToolResourceLinkDao {
 	/**
 	 * Logger.
 	 */

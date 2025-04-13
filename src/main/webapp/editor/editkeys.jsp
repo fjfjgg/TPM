@@ -6,8 +6,7 @@
 <%@page import="es.us.dit.lti.entity.MgmtUser,es.us.dit.lti.persistence.ToolDao"%>
 <%@page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@taglib prefix="e"
-	uri="https://www.owasp.org/index.php/OWASP_Java_Encoder_Project"%>
+<%@taglib prefix="e" uri="owasp.encoder.jakarta"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <jsp:useBean id="mgmtUser" type="es.us.dit.lti.entity.MgmtUser"
 	scope="session"></jsp:useBean>
@@ -32,7 +31,7 @@
 	
 	if (tool == null || toolTitle == null || ToolDao.getToolUserType(mgmtUser, tool) > MgmtUserType.EDITOR.getCode()) {
 	%>
-	<h1><a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+	<h1><a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 		Error
 	</h1>
 	<h2>No tiene acceso.</h2>
@@ -44,7 +43,7 @@
 		pageContext.setAttribute("tool", tool);
 %>
 	<h1>
-		<a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+		<a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 		Claves de la herramienta
 	</h1>
 	<p>Herramienta habilitada:  <span class="material-icons">${tool.enabled ? 'check' : 'block'}</span></p>

@@ -42,26 +42,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import jakarta.el.ELContext;
-import jakarta.el.ExpressionFactory;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
-import jakarta.servlet.jsp.JspFactory;
-import jakarta.servlet.jsp.PageContext;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import es.us.dit.lti.MessageMap;
 import es.us.dit.lti.OutcomeService;
+import es.us.dit.lti.SecurityUtil;
 import es.us.dit.lti.ToolSession;
 import es.us.dit.lti.config.ToolUiConfig;
 import es.us.dit.lti.entity.Attempt;
@@ -76,6 +63,18 @@ import es.us.dit.lti.persistence.ToolDao;
 import es.us.dit.lti.runner.ToolRunner;
 import es.us.dit.lti.runner.ToolRunnerFactory;
 import es.us.dit.lti.runner.ToolRunnerType;
+import jakarta.el.ELContext;
+import jakarta.el.ExpressionFactory;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import jakarta.servlet.jsp.JspFactory;
+import jakarta.servlet.jsp.PageContext;
 
 /**
  * Servlet that processes an assessment or redirect attempt.
@@ -115,7 +114,7 @@ public class AssessServlet extends HttpServlet {
 	/**
 	 * Number of concurrent users being assessed.
 	 */
-	private SortedSet<String> concurrentUsers = Collections.synchronizedSortedSet(new TreeSet<String>());
+	private final SortedSet<String> concurrentUsers = Collections.synchronizedSortedSet(new TreeSet<String>());
 	
 	
 	/**
@@ -163,7 +162,6 @@ public class AssessServlet extends HttpServlet {
 			} else {
 				maxUploadSize = tui.getInputFileSize();
 			}
-			//Old upload.setSizeMax(maxUploadSize * 1024);
 
 			Iterator<Part> iter = null;
 			if (tool.isEnabled() && (isInstructor || tool.isEnabledByDate(requestDate, DEFAULT_GRACE_TIME))) {
@@ -293,6 +291,9 @@ public class AssessServlet extends HttpServlet {
 											// The output is saved in the instructor's directory
 											outputPath = attempt.getCorrectorResultPath(attempt.getId());
 											filename = originalAttempt.getFileName();
+											// Copy sid in case user is the original user, because no new attempt will
+											// be created
+											attempt.setSid(originalAttempt.getSid());
 											isReassessment = true;
 										} else {
 											userFilePath = null;
@@ -344,6 +345,7 @@ public class AssessServlet extends HttpServlet {
 				} else if (userFilePath != null && filename != null) {
 					int scoreInt = 1000;
 					final boolean nocal = !ts.isOutcomeAllowed();
+					final File resultFile = new File(outputPath);
 					if (maxConcurrencyOnlyStoreMode) {
 						scoreInt = ToolRunner.ERROR_CONCURRENT_EXCEPTION;
 						// this modo is only enabled if keep files is enabled.
@@ -364,22 +366,16 @@ public class AssessServlet extends HttpServlet {
 							logger.info("{}:{} > {} > result={}", tool.getName(), counter, userId, scoreInt);
 							
 							// Output of execution
-							final File resultFile = new File(outputPath);
 							if (resultFile.exists() && resultFile.length() > 0) {
 								attempt.setOutputSaved(true);
-								try (BufferedInputStream br = new BufferedInputStream(new FileInputStream(resultFile));) {
-									WriterOutputStream wos = WriterOutputStream.builder().setWriter(out)
-											.setCharset(StandardCharsets.UTF_8).get();
-									br.transferTo(wos);
-									wos.flush();
-								} catch (final IOException e) {
-									out.println("<p><b>" + text.get("T_ERROR_IO") + "</b></p>");
-								}
 							}
 							// Delete unnecessary files
 							try {
 								if (!tui.isKeepFiles() && !tui.isKeepOutput()) {
-									FileUtils.deleteDirectory(new File(attempt.getUserFolderPath()));
+									clean(outputPath); // Clean error output
+									if (!new File(userFilePath).delete()) {
+										logger.error("Error deleting files");
+									}
 									attempt.setFileSaved(false);
 									attempt.setOutputSaved(false);
 								} else if (tui.isEnableInstructorCommand() && filename.equals(tui.getCommandFilename())
@@ -391,13 +387,13 @@ public class AssessServlet extends HttpServlet {
 									} else {
 										attempt.setFileSaved(false);
 									}
-									executer.clean(outputPath);
+									clean(outputPath); // Clean error output
 									attempt.setOutputSaved(false);
 								} else if (!tui.isKeepFiles() || !tui.isKeepOutput()) {
 									// not keep all
 									if (tui.isKeepFiles()) {
-										// keep files, delete output
-										executer.clean(outputPath);
+										// keep files, delete error output
+										clean(outputPath); // Clean error output
 										attempt.setOutputSaved(false);
 									} else if (tui.isKeepOutput() && !new File(userFilePath).delete()) {
 										// keep output, delete files
@@ -461,6 +457,30 @@ public class AssessServlet extends HttpServlet {
 								attempt.getInstant());
 						if (aux == null) {
 							ToolAttemptDao.create(attempt);
+						}
+					}
+					// Send output
+					if (resultFile.exists() && resultFile.length() > 0) {
+						if (!tui.isRedirectMode()) {
+							// Generate iframe
+							String secureId = SecurityUtil.getSecureSid(attempt);
+							out.println("<iframe class='resized' src='attempt/" + URLDecoder
+									.decode(attempt.getResourceUser().getUser().getSourceId(), StandardCharsets.UTF_8)
+									+ "/output/" + secureId + "'></iframe>");
+						} else {
+							// Copy to response
+							try (BufferedInputStream br = new BufferedInputStream(new FileInputStream(resultFile));) {
+								WriterOutputStream wos = WriterOutputStream.builder().setWriter(out)
+										.setCharset(StandardCharsets.UTF_8).get();
+								br.transferTo(wos);
+								wos.flush();
+							} catch (final IOException e) {
+								out.println("<p><b>" + text.get("T_ERROR_IO") + "</b></p>");
+							}
+
+							if (!attempt.isOutputSaved() && !resultFile.delete()) {
+								logger.error("Error deleting file");
+							}
 						}
 					}
 				}
@@ -700,8 +720,13 @@ public class AssessServlet extends HttpServlet {
 						}
 					}
 				} else {
-					extraArgs
-							.add((String) ef.createValueExpression(elContext, token, String.class).getValue(elContext));
+					try {
+						extraArgs.add(
+								(String) ef.createValueExpression(elContext, token, String.class).getValue(elContext));
+					} catch (final Exception e) {
+						logger.error("Error processing extraArgs {}: {}", token, e.getMessage());
+						extraArgs.add("");
+					}
 				}
 			}
 		}
@@ -735,5 +760,17 @@ public class AssessServlet extends HttpServlet {
 	 */
 	private String formatError(String error) {
 		return "<p class='error'>" + error + "</p>";
+	}
+	
+	/**
+	 * Clean output error file but do not delete output file yet.
+	 *
+	 * @param outputPath output file path
+	 */
+	private void clean(String outputPath) {
+		final File outputErr = new File(outputPath + Settings.OUTPUT_ERROR_EXT);
+		if (outputErr.exists() && !outputErr.delete()) {
+			logger.error("Error deleting output.error");
+		}
 	}
 }

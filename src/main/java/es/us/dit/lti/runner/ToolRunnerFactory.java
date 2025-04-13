@@ -24,7 +24,7 @@ package es.us.dit.lti.runner;
  *
  * @author Francisco José Fernández Jiménez
  */
-public class ToolRunnerFactory {
+public final class ToolRunnerFactory {
 
 	/**
 	 * Can not create objects.

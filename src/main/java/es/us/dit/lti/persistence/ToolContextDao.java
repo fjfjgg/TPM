@@ -39,7 +39,7 @@ import es.us.dit.lti.entity.Context;
  *
  * @author Francisco José Fernández Jiménez
  */
-public class ToolContextDao {
+public final class ToolContextDao {
 	/**
 	 * Logger.
 	 */

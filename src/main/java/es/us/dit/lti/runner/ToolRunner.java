@@ -82,10 +82,4 @@ public interface ToolRunner {
 	int exec(String filePath, String outputPath, String userId, String originalFilename, int counter,
 			boolean isInstructor, List<String> extraArgs, long maxSecondsWait);
 
-	/**
-	 * Clean output files.
-	 *
-	 * @param outputPath output file path
-	 */
-	void clean(String outputPath);
 }

@@ -19,7 +19,7 @@
 	<div class="h1container dialog">
 		
 		<h1>
-			<a href="../user/menu.jsp"><span class="material-icons bcerrar">close</span></a> 
+			<a href="../user/menu.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a> 
 			Usuarios
 		</h1>
 		<%

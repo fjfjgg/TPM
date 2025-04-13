@@ -103,7 +103,7 @@ public class AppLoader implements ServletContextListener {
 			logger.info("Do not forget to set cookie sameSite to strict");
 		}
 
-		sce.getServletContext().setAttribute("appVersion", "1.1");
+		sce.getServletContext().setAttribute("appVersion", "1.2");
 
 		appDbUtil = new DbUtilSingleConnection();
 		SettingsDao.setDbUtil(appDbUtil);

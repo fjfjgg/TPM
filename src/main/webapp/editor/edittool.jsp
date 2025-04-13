@@ -6,7 +6,7 @@
 <%@page
 	import="es.us.dit.lti.entity.MgmtUser,es.us.dit.lti.persistence.ToolDao,org.owasp.encoder.Encode"%>
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@taglib prefix="e" uri="https://www.owasp.org/index.php/OWASP_Java_Encoder_Project" %>
+<%@taglib prefix="e" uri="owasp.encoder.jakarta"%>
 <jsp:useBean id="mgmtUser" type="es.us.dit.lti.entity.MgmtUser" scope="session" />
 <jsp:useBean id="text" type="es.us.dit.lti.MessageMap" scope="session" />
 <!DOCTYPE html>
@@ -31,7 +31,7 @@
 		
 		if (tool == null || toolPermission > MgmtUserType.EDITOR.getCode()) {
 	%>
-		<h1><a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+		<h1><a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 			Error
 		</h1>
 		<h2>No tiene acceso.</h2>
@@ -40,11 +40,16 @@
 		session.setAttribute("lasttool", toolname);
 		String downloadCorrector = "download?toolname=" + URLEncoder.encode(toolname,StandardCharsets.UTF_8) + "&type=corrector";
 		String downloadDescription = "download?toolname=" + URLEncoder.encode(toolname,StandardCharsets.UTF_8) + "&type=description";
-
+		String downloadExtraZip = "download?toolname=" + URLEncoder.encode(toolname,StandardCharsets.UTF_8) + "&type=extra";
+		boolean extraZipExists = false;
+		java.io.File f = new java.io.File(tool.getExtraZipPath());
+		if(f.exists() && !f.isDirectory()) { 
+		    extraZipExists = true;
+		}
 		pageContext.setAttribute("tool", tool);
 	%>
 	<h1>
-		<a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+		<a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 		Editar herramienta
 	</h1>
 	<h2>Introduzca los datos de la herramienta "<%=Encode.forHtml(toolname)%>"</h2>
@@ -95,6 +100,15 @@
 					class="material-icons a-src-modal" title="Editar como texto" 
 					data-name="Descripción para usuarios" data-id="descriptionfile" data-type="html">edit</a>
 				<span><input type="file" id="descriptionfile" name="descriptionfile"><br /></span>
+			</div>
+
+			<div title="Zip con recursos extra referenciados en la descripción (ruta relativa 'extra/')">ZIP con recursos extra</div>
+			<div>
+				<% if (extraZipExists) { %>
+				<a id="downExtraZip" href="<%=downloadExtraZip%>"
+					class="material-icons" target="_blank" title="Descargar" download>download</a>
+				<% } %>
+				<span><input type="file" id="extrazipfile" name="extrazipfile" title="ZIP con recursos referenciados por la descripción (ruta relativa 'extra/')"><br /></span>
 			</div>
 
 			<div title="Modo en la que se ejecuta la herramienta">Tipo de herramienta</div>

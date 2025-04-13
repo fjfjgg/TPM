@@ -1,7 +1,7 @@
 <%@page import="es.us.dit.lti.entity.MgmtUser"%>
 <%@page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@taglib prefix="e" uri="https://www.owasp.org/index.php/OWASP_Java_Encoder_Project"%>
+<%@taglib prefix="e" uri="owasp.encoder.jakarta"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <jsp:useBean id="mgmtUser" type="es.us.dit.lti.entity.MgmtUser"
 	scope="session"></jsp:useBean>
@@ -18,7 +18,7 @@
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
 	<div id="loginDiv" class="h1container dialog">
 		<h1>
-			<a href="../user/menu.jsp"><span class="material-icons bcerrar">close</span></a> 
+			<a href="../user/menu.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a> 
 			Datos personales
 		</h1>
 		<div class="editfields">

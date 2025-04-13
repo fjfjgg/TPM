@@ -36,7 +36,7 @@ import es.us.dit.lti.entity.Nonce;
  *
  * @author Francisco José Fernández Jiménez
  */
-public class ToolNonceDao {
+public final class ToolNonceDao {
 	/**
 	 * Logger.
 	 */

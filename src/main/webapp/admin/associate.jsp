@@ -26,7 +26,7 @@ if (tool != null &&
 	<%@include file="/WEB-INF/includes/cabecera.jsp"%>
 	<div class="h1container dialog">
 		<h1>
-			<a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+			<a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 			Asociar usuarios
 		</h1>
 

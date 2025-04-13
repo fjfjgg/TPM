@@ -81,6 +81,10 @@ public class EditToolServlet extends HttpServlet {
 	 * Description file parameter.
 	 */
 	private static final String DESCRIPTION_PARAM = "descriptionfile";
+	/**
+	 * Extra ZIP file parameter.
+	 */
+	private static final String EXTRAZIP_PARAM = "extrazipfile";
 
 	/**
 	 * Processes POST request.
@@ -114,8 +118,9 @@ public class EditToolServlet extends HttpServlet {
 			String resMsg = null;
 			if (doCreate && sessionUser.getAdmin()) {
 				resMsg = createTool(sessionUser, paramTool, iter);
-				if (resMsg.equals("T_HERRAMIENTA_CREADA"))
+				if (resMsg.equals("T_HERRAMIENTA_CREADA")) {
 					session.setAttribute("lasttool", paramTool.getName());
+				}
 			} else if (!doCreate) {
 				resMsg = updateTool(sessionUser, paramTool, iter);
 			}
@@ -141,6 +146,7 @@ public class EditToolServlet extends HttpServlet {
 		Part fi;
 		UploadedFile descriptionFile = null;
 		UploadedFile correctorFile = null;
+		UploadedFile extraZipFile = null;
 		while (iter.hasNext()) {
 			fi = iter.next();
 			if (fi.getContentType() != null) {
@@ -149,8 +155,10 @@ public class EditToolServlet extends HttpServlet {
 				if (fi.getSubmittedFileName() != null && !fi.getSubmittedFileName().isEmpty()) {
 					if (fieldName.equals(CORRECTOR_PARAM)) {
 						correctorFile = new UploadedFile(fi);
-					} else {
+					} else if (fieldName.equals(DESCRIPTION_PARAM)) {
 						descriptionFile = new UploadedFile(fi);
+					} else {
+						extraZipFile = new UploadedFile(fi);
 					}
 				}
 			} else {
@@ -170,7 +178,7 @@ public class EditToolServlet extends HttpServlet {
 		String resMsg;
 		if (correctorFile != null && descriptionFile != null) {
 			try {
-				if (ToolDao.create(sessionUser, paramTool, correctorFile, descriptionFile)) {
+				if (ToolDao.create(sessionUser, paramTool, correctorFile, descriptionFile, extraZipFile)) {
 					resMsg = "T_HERRAMIENTA_CREADA";
 				} else {
 					resMsg = "T_ERROR_CREAR_HERRAMIENTA";
@@ -198,6 +206,7 @@ public class EditToolServlet extends HttpServlet {
 		Part fi;
 		UploadedFile descriptionFile = null;
 		UploadedFile correctorFile = null;
+		UploadedFile extraZipFile = null;
 		String oldname = "";
 
 		boolean authorized = false;
@@ -213,6 +222,8 @@ public class EditToolServlet extends HttpServlet {
 						correctorFile = new UploadedFile(fi);
 					} else if (fieldName.equals(DESCRIPTION_PARAM)) {
 						descriptionFile = new UploadedFile(fi);
+					} else if (fieldName.equals(EXTRAZIP_PARAM)) {
+						extraZipFile = new UploadedFile(fi);
 					}
 				}
 			} else {
@@ -265,7 +276,7 @@ public class EditToolServlet extends HttpServlet {
 		// Verify that the user can actually edit
 		if (authorized) {
 			try {
-				if (ToolDao.update(paramTool, oldname, correctorFile, descriptionFile)) {
+				if (ToolDao.update(paramTool, oldname, correctorFile, descriptionFile, extraZipFile)) {
 					resMsg = "T_HERRAMIENTA_EDITADA";
 				} else {
 					resMsg = "T_ERROR_EDITAR_HERRAMIENTA";

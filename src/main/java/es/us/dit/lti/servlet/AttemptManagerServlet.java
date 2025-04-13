@@ -40,7 +40,6 @@ import es.us.dit.lti.entity.Attempt;
 import es.us.dit.lti.entity.Settings;
 import es.us.dit.lti.entity.Tool;
 import es.us.dit.lti.persistence.ToolAttemptDao;
-import es.us.dit.lti.runner.ToolRunner;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -110,7 +109,7 @@ public class AttemptManagerServlet extends HttpServlet {
 		if (uid != null && cipheredSid != null && tool != null) {
 			uid = URLDecoder.decode(uid, StandardCharsets.UTF_8);
 			final Attempt attempt = ToolAttemptDao.getBySecuredSid(cipheredSid, ts.getToolKey());
-			if (attempt != null && tool.getToolUiConfig().isShowAttempts() && (uid.equals(userId)
+			if (attempt != null && (uid.equals(userId)
 					&& ts.getLtiResourceUser().getUser().getSid() == attempt.getResourceUser().getUser().getSid()
 					|| request.getServletPath().equals("/instructor/attempt")
 							&& tool.getToolUiConfig().isManageAttempts())) {
@@ -119,7 +118,7 @@ public class AttemptManagerServlet extends HttpServlet {
 				final File f = getFile(attempt, output);
 				if (f != null) {
 					if (output) {
-						response.setContentType("text/html");
+						response.setContentType(tool.getToolUiConfig().getOutputMimeType()); 
 					} else {
 						response.setContentType(request.getServletContext().getMimeType(f.getName()));
 						response.setHeader("Content-Disposition", "inline; filename=\"" + attempt.getFileName() + "\"");
@@ -128,6 +127,10 @@ public class AttemptManagerServlet extends HttpServlet {
 						fis.transferTo(response.getOutputStream());
 					} catch (final IOException e) {
 						logger.error("Error sending file", e);
+					}
+					// If file should be deleted, do it
+					if (output && !attempt.isOutputSaved() && !f.delete()) {
+						logger.error("Error deleting file");
 					}
 				}
 			} else {
@@ -175,8 +178,7 @@ public class AttemptManagerServlet extends HttpServlet {
 	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
 	 */
 	@Override
-	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			final HttpSession session = request.getSession();
 			final ToolSession ts = (ToolSession) session.getAttribute(ToolSession.class.getName());
@@ -206,9 +208,8 @@ public class AttemptManagerServlet extends HttpServlet {
 						}
 						// result/output
 						f = getFile(attempt, true);
-						final ToolRunner executer = AssessServlet.getToolRunner(tool);
-						if (f != null && executer != null) {
-							executer.clean(f.getPath());
+						if (f != null ) {
+							clean(f.getPath());
 						}
 						response.sendError(HttpServletResponse.SC_NO_CONTENT);
 					} else {
@@ -237,8 +238,7 @@ public class AttemptManagerServlet extends HttpServlet {
 	 *      response)
 	 */
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			request.setCharacterEncoding("UTF-8");
 		} catch (final UnsupportedEncodingException e1) {
@@ -308,7 +308,7 @@ public class AttemptManagerServlet extends HttpServlet {
 				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 				request.getRequestDispatcher("/errorlogin.html").include(request, response);
 			}
-		} catch (IOException | ServletException e) {
+		} catch (final IOException | ServletException e) {
 			logger.error("IO Error.", e);
 		}
 	}
@@ -341,6 +341,22 @@ public class AttemptManagerServlet extends HttpServlet {
 			}
 		} catch (final Exception e) {
 			logger.error("Error creating ZIP: ", e);
+		}
+	}
+	
+	/**
+	 * Clean output files.
+	 *
+	 * @param outputPath output file path
+	 */
+	public static void clean(String outputPath) {
+		final File output = new File(outputPath);
+		final File outputErr = new File(outputPath + Settings.OUTPUT_ERROR_EXT);
+		if (output.exists() && !output.delete()) {
+			logger.error("Error deleting output");
+		}
+		if (outputErr.exists() && !outputErr.delete()) {
+			logger.error("Error deleting output.error");
 		}
 	}
 }

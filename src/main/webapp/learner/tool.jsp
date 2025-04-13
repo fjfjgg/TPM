@@ -5,14 +5,14 @@
 <%@page import="es.us.dit.lti.config.ToolUiConfig"%>
 <%@page import="es.us.dit.lti.ToolSession"%>
 <%@page import="es.us.dit.lti.entity.Tool"%>
-<%@page import="java.io.IOException"%>
-<%@page import="es.us.dit.lti.entity.Settings,java.io.FileInputStream"%>
+<%@page import="es.us.dit.lti.entity.Settings,java.io.IOException"%>
+<%@page import="java.io.FileInputStream"%>
 <%@page
 	import="es.us.dit.lti.entity.MgmtUser,es.us.dit.lti.persistence.ToolDao,org.owasp.encoder.Encode"%>
 <%@page import="java.nio.charset.StandardCharsets,org.apache.commons.io.output.WriterOutputStream"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
-<%@taglib prefix="e" uri="https://www.owasp.org/index.php/OWASP_Java_Encoder_Project" %>
+<%@taglib prefix="e" uri="owasp.encoder.jakarta"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %> 
 <jsp:useBean id="text" type="es.us.dit.lti.MessageMap" scope="session" />
 <%
@@ -59,7 +59,7 @@ if (tool != null && tool.getName() != null) {
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" >
-	<% 
+	<%
 	if (Settings.getAppName()== null || Settings.getAppName().isEmpty()) {
 		out.println("<title>"+text.get("T_NOMBRE_LTI")+"</title>");
 	} else {
@@ -102,7 +102,7 @@ if (tool != null && tool.getName() != null) {
 	<link rel="stylesheet" type="text/css" href="css/attempts.css" />
 	<script src="js/attempts.js"></script>
 	<script>
-	var attemptsDependsOnFilename=<%=tui.isMaxAttemptsDependsOnFilenames() %>;
+	var attemptsDependsOnFilename=<%=tui.isMaxAttemptsDependsOnFilenames()%>;
 	</script>
 	<% } %>
 </head>
@@ -113,8 +113,8 @@ if (tool != null && tool.getName() != null) {
 				<div id="editmodeWrapper">
 					<div id="content" class="contentBox">
 						<div id="pageTitleDiv" class="pageTitle clearfix ">
-							<div id="pageTitleBar" class='pageTitleIcon' tabindex="0">
-						  		<h1 id="pageTitleHeader" tabindex="-1" ><span id="pageTitleText">
+							<div id="pageTitleBar" class='pageTitleIcon'>
+						  		<h1 id="pageTitleHeader"><span id="pageTitleText">
 						  			<span style="color:#000000;"><%=Encode.forHtmlContent(titulo) %></span>  </span></h1>
 						  		<% if (Settings.getAppName()== null || Settings.getAppName().isEmpty()) { %>
 						  		<p><fmt:message key="T_NOMBRE_LTI"/> - Departamento de Ingeniería Telemática - Universidad de Sevilla</p>
@@ -124,7 +124,7 @@ if (tool != null && tool.getName() != null) {
 							</div>
 							<%
 							//Is there a notice?
-							String notice = Settings.getNotice();
+							String notice = es.us.dit.lti.entity.Settings.getNotice();
 							if (notice != null && !notice.isEmpty() ) {
 								%>
 							<div id="notice"><%=notice %></div>
@@ -136,6 +136,7 @@ if (tool != null && tool.getName() != null) {
 							<%
 							if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty() && tui.isPasswordProtected()
 									&& !tool.getDeliveryPassword().equals(request.getParameter("password"))) {
+								session.removeAttribute("extraFileAuthorized");
 							%>
 							<div>
 								<form id="fsdelivery" action="" method="post">
@@ -156,6 +157,7 @@ if (tool != null && tool.getName() != null) {
 							</div>	
 							<%
 							} else {
+								session.setAttribute("extraFileAuthorized", true);
 							%>
 							<fieldset id="description" class="infocontainer" data-toggle="parentdescription">
 								<legend><fmt:message key="T_DESCRIPCION"/></legend>
@@ -185,10 +187,10 @@ if (tool != null && tool.getName() != null) {
 								<p id="parentattempts" class="toggleButton">
 									<a id="showattempts" title="<fmt:message key="T_MOSTRAR_INTENTOS"/>" class="genericButton"
 										data-toggle="attempts">
-									<span class="material-icons">restore</span></a></p>								
+									<span class="material-icons" accessKey="p">restore</span></a></p>								
 							<%} %>
 							<p id="parentassessment" class="toggleButton hidden">
-									<a id="showassessment" title="<fmt:message key="T_MOSTRAR_RESULTADOS"/>" class="genericButton" data-toggle="assessment">
+									<a id="showassessment" title="<fmt:message key="T_MOSTRAR_RESULTADOS"/>" class="genericButton" data-toggle="resultoutput">
 									<span class="material-icons">assessment</span></a></p>
 							<p id="parentdelivery" class="toggleButton hidden">
 									<a id="showdelivery" title="<fmt:message key="T_MOSTRAR_FORMULARIO"/>" class="genericButton" data-toggle="fsdelivery">
@@ -201,7 +203,7 @@ if (tool != null && tool.getName() != null) {
 									<legend> ${e:forHtml(! empty ts.tool.toolUiConfig.legendForm ? ts.tool.toolUiConfig.legendForm : text.T_ENTREGA)} </legend>
 									<p>
 									<% if (tool. getEnabledUntil() != null) { %>
-									<label><fmt:message key="T_HABILITADA_HASTA"/>: </label> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/><br />
+									<b><fmt:message key="T_HABILITADA_HASTA"/>: </b> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/><br />
 									<% } %>
 									<%if (tui.isEnableSendText()) { %>
 									<fmt:message key="T_ESCRIBA_TEXTO"/>
@@ -243,7 +245,7 @@ if (tool != null && tool.getName() != null) {
 						</div>
 						<p id="plogout" class="">
 							<a id="alogout" title="<fmt:message key="T_SALIR"/>" class="genericButton" href="${ts.ltiReturnUrl}"> <span
-								class="material-icons">logout</span></a>
+								class="material-icons" accesskey="x">logout</span></a>
 						</p>
 					</div>
 				</div>

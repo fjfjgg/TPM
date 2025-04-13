@@ -261,6 +261,10 @@ function activarAcciones() {
 	}
 	if (!document.getElementById('selectUser')) {
 		obtenerUsuarios();
+	} else {
+		let input = document.getElementById('selectUser');
+		input.value="";
+		input.lastvalue="";
 	}
 }
 
@@ -424,6 +428,7 @@ function showUserInfo(userId, attemptId, result) {
 	let element = document.getElementById("revoutput");
 	let fs = document.createElement("fieldset");
 	fs.className='infocontainer';
+	fs.id='outputuser';
 	let l = document.createElement("legend");
 	l.appendChild(document.createTextNode(userId));
 	fs.appendChild(l);

@@ -63,7 +63,7 @@ if (permisos <= MgmtUserType.TESTER.getCode()
 	<div class="h1container dialog">
 		
 		<h1>
-			<a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+			<a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 			Prueba de herramientas
 		</h1>
 		<%
@@ -80,7 +80,7 @@ if (permisos <= MgmtUserType.TESTER.getCode()
 		  <% if (tool.getToolUiConfig().isRedirectMode()) { %>
 			<p>
 				<a id="test" href="?learner" target="_blank"> <input
-					type='button' name='submit'
+					type='button' name='submit' autofocus
 					value='Probar redirección en nueva ventana como estudiante' /></a>
 			</p>
 			<p>
@@ -91,7 +91,7 @@ if (permisos <= MgmtUserType.TESTER.getCode()
 		  <% } else { %>
 			<p>
 				<a id="test" href="?learner" target="_blank"> <input
-					type='button' name='submit'
+					type='button' name='submit' autofocus
 					value='Probar en nueva ventana como estudiante' /></a>
 			</p>
 			<p>

@@ -8,7 +8,7 @@
 	</div>
 	<div id="aboutdiv">
 		<p id="about">
-		<strong>&copy; 2023</strong>
+		<strong>&copy; 2025</strong>
 		<img src="../img/dit.gif" alt="Departamento de Ingeniería Telemática" width="35" height="35">
 		Departamento de Ingeniería Telemática
 		<img src="../img/uslogo.png" alt="Universidad de Sevilla" width="40" height="35">

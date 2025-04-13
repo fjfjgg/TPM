@@ -84,7 +84,7 @@ if (updated) {
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
 	<div class="h1container dialog">
 		<h1>
-			<a href="../user/menu.jsp"><span class="material-icons bcerrar">close</span></a> 
+			<a href="../user/menu.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a> 
 				Ajustes
 		</h1>
 		<% 

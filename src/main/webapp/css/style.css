@@ -273,7 +273,7 @@ input[type="button"]:disabled, input[type="submit"]:disabled, button:disabled
 }
 
 #downDescription, #downCorrector, #seeDescription, #seeCorrector, #editDescription,
-	#editCorrector {
+	#editCorrector, #downExtraZip, #seeExtraZip {
 	text-decoration: none;
 	color: #6E3436;
 	vertical-align: middle;

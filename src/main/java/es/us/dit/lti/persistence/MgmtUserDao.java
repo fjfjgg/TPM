@@ -42,7 +42,7 @@ import es.us.dit.lti.entity.MgmtUserType;
  *
  * @author Francisco José Fernández Jiménez
  */
-public class MgmtUserDao {
+public final class MgmtUserDao {
 	/**
 	 * Logger.
 	 */

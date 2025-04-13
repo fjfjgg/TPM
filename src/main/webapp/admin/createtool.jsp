@@ -17,7 +17,7 @@
 	<div class="h1container dialog">
 		
 		<h1>
-			<a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+			<a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 			Nueva herramienta
 		</h1>
 		
@@ -59,6 +59,11 @@
 					class="material-icons a-src-modal" title="Editar como texto" 
 						data-name="Descripción para usuarios" data-id="descriptionfile" data-type="html">edit</a>
 					<span><input type="file" id="descriptionfile" name="descriptionfile" required="required" title="Descripción en formato HTML"><br /></span>
+				</div>
+				
+				<div title="Zip con recursos extra referenciados en la descripción (ruta relativa 'extra/')">ZIP con recursos extra</div>
+				<div>
+					<span><input type="file" id="extrazipfile" name="extrazipfile" title="ZIP con recursos referenciados por la descripción (ruta relativa 'extra/')"><br /></span>
 				</div>
 
 				<div title="Modo en la que se ejecuta la herramienta">Tipo de herramienta</div>

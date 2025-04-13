@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import es.us.dit.lti.config.ExecutionRestrictionsConfig;
-import es.us.dit.lti.entity.Settings;
 
 /**
  * Dummy Runner.
@@ -100,7 +99,7 @@ public class DummyRunner implements ToolRunner {
 				maxSecondsWait = Long.parseLong(extraArgs.get(0));
 			} catch (final NumberFormatException e) {
 				// ignore
-				logger.error("Error parsing long.", e);
+				logger.info("First extra argument must be a integer (seconds of waiting).");
 			}
 		}
 
@@ -111,9 +110,12 @@ public class DummyRunner implements ToolRunner {
 		try {
 			// Write something in output
 			try (PrintWriter out = new PrintWriter(output, StandardCharsets.UTF_8);) {
+				out.println("<pre>");
+				int i = 0;
 				for (final String arg : args) {
-					out.println(arg);
+					out.println(i++ + ":[" + arg + "]");
 				}
+				out.println("</pre>");
 			}
 			Thread.sleep(maxSecondsWait * 1000);
 			result = 100;
@@ -131,20 +133,4 @@ public class DummyRunner implements ToolRunner {
 
 	}
 
-	/**
-	 * Clean the output files.
-	 *
-	 * @param outputPath output file path.
-	 */
-	@Override
-	public void clean(String outputPath) {
-		final File output = new File(outputPath);
-		final File outputErr = new File(outputPath + Settings.OUTPUT_ERROR_EXT);
-		if (output.exists() && !output.delete()) {
-			logger.error("Error deleting output");
-		}
-		if (outputErr.exists() && !outputErr.delete()) {
-			logger.error("Error deleting output.error");
-		}
-	}
 }

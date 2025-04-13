@@ -8,8 +8,7 @@
 <%@page import="es.us.dit.lti.entity.MgmtUser,es.us.dit.lti.persistence.ToolDao"%>
 <%@page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@taglib prefix="e"
-	uri="https://www.owasp.org/index.php/OWASP_Java_Encoder_Project"%>
+<%@taglib prefix="e" uri="owasp.encoder.jakarta"%>
 <jsp:useBean id="mgmtUser" type="es.us.dit.lti.entity.MgmtUser"	scope="session" />
 <jsp:useBean id="text" type="es.us.dit.lti.MessageMap" scope="session" />
 <!DOCTYPE html>
@@ -34,7 +33,7 @@
 			
 			if (tool == null || toolTitle == null || ToolDao.getToolUserType(mgmtUser, tool) > MgmtUserType.EDITOR.getCode()) {
 	%>
-		<h1><a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+		<h1><a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 			Error
 		</h1>
 		<h2>Ha habido un problema comprobando si tiene acceso.</h2>
@@ -44,14 +43,21 @@
 } else {
 		String downloadCorrector = "../editor/download?toolname=" + URLEncoder.encode(toolTitle,StandardCharsets.UTF_8) + "&type=corrector";
 		String downloadDescription = "../editor/download?toolname=" + URLEncoder.encode(toolTitle,StandardCharsets.UTF_8) + "&type=description";
+		String downloadExtraZip = "download?toolname=" + URLEncoder.encode(toolTitle,StandardCharsets.UTF_8) + "&type=extra";
+		boolean extraZipExists = false;
+		java.io.File f = new java.io.File(tool.getExtraZipPath());
+		if(f.exists() && !f.isDirectory()) { 
+		    extraZipExists = true;
+		}
 		int lastOcc = toolTitle.length();
 		session.setAttribute("lasttool", toolTitle);
 		File description = new File(tool.getDescriptionPath());
 		File corrector = new File(tool.getCorrectorPath());
+		File extraZip = new File(tool.getExtraZipPath());
 %>
 	
 	<h1>
-		<a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+		<a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 		Información de la herramienta
 	</h1>
 	<h2>Datos</h2>
@@ -88,6 +94,16 @@
 			title="Mostrar" data-name="Descripción para usuarios">visibility</a>
 			<%=description.length() %> bytes 
 		</div>
+		
+		<div title="Zip con recursos extra referenciados en la descripción (ruta relativa 'extra/')">ZIP con recursos extra</div>
+		<div>
+			<% if (extraZipExists) { %>
+			<a id="downExtraZip" href="<%=downloadExtraZip%>"
+				class="material-icons" target="_blank" title="Descargar" download>download</a>
+				<%=extraZip.length() %> bytes 
+			<% } %>
+		</div>
+		
 		
 		<div title="Modo en la que se ejecuta la herramienta">Tipo de herramienta</div>
 		<div> <%=text.get(tool.getToolType().toString())%></div>

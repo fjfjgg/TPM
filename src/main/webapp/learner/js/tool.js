@@ -214,14 +214,21 @@ function createResult(text) {
 	let element = document.getElementById("result");
 	let fs = document.createElement("fieldset");
 	fs.className='infocontainer';
-	fs.id="assessment";
+	fs.id="resultoutput";
 	fs.dataset.toggle='parentassessment';
 	let l = document.createElement("legend");
 	l.appendChild(document.createTextNode(texts.resultTitle));
 	fs.appendChild(l);
+	let divr = document.createElement("div");
+	divr.className = "resizer";
+	fs.appendChild(divr);
 	element.innerHTML="";
 	element.appendChild(fs);
-	fs.innerHTML+=text;
+	divr.innerHTML+=text;
+	let ifr = divr.querySelector(".resized");
+	if (ifr) {
+		ifr.onload = resizeFullHeight;
+	}
 	addClose(element.firstChild.firstChild);
 	if (typeof changeUser == "function") {
 		changeUser();
@@ -240,6 +247,10 @@ function addClose(legend, onclick) {
     a.onclick=toggleHidden;
   }
   a.textContent="close";
+  //accesskey, use first character of parent ID
+  if (legend.parentNode.id) {
+  	a.accessKey=legend.parentNode.id[0];
+  }
   legend.insertBefore(a,legend.firstChild);
 }
 
@@ -264,6 +275,23 @@ function toggleHidden(event) {
 	} else {
 		toHide.parentNode.removeChild(toHide);
 	}
+}
+
+function resizeFullHeight(event) {
+	let element = event.currentTarget;
+	element.style.height = '';
+	let newHeight;
+	try {
+		newHeight = element.contentWindow.document.body.scrollHeight;
+		if (!newHeight) {
+			element.parentNode.style.height = '75vh';
+		} else {
+			element.style.height = newHeight + 'px';
+		} 
+	} catch (error) {
+		element.parentNode.style.height = '75vh';
+	}
+	
 }
 
 window.addEventListener("load", function() {

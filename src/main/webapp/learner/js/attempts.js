@@ -286,29 +286,23 @@ function showOutput(event) {
 	event.preventDefault();
 	let element = document.getElementById("revoutput");
 	let attemptid = this.parentNode.parentNode.children[0].textContent;
-	fetch(this.href, { method: 'GET' })
-		.then(response => {
-			if (!response.ok) {
-		    	throw new Error('Error de acceso');
-		    }
-			return response.text() 
-		})
-		.then(result => {
-			let fs = document.createElement("fieldset");
-			fs.className='infocontainer';
-			let l = document.createElement("legend");
-			l.appendChild(document.createTextNode(attemptid));
-			fs.appendChild(l);
-			element.innerHTML="";
-			element.appendChild(fs);
-			fs.innerHTML+=result;
-			
-			addClose(element.firstChild.firstChild);
-		})
-		.catch(error => {
-			element.innerHTML = "<p>"+texts.errorNoResponse+"</p>";
-			console.log(error);
-		});
+	let fs = document.createElement("fieldset");
+	fs.id = "output";
+	fs.className='infocontainer';
+	let l = document.createElement("legend");
+	l.appendChild(document.createTextNode(attemptid));
+	fs.appendChild(l);
+	let divr = document.createElement("div");
+	divr.className = "resizer";
+	let ifr = document.createElement("iframe");
+	ifr.className = "resized";
+	ifr.src = this.href;
+	ifr.addEventListener("load", resizeFullHeight);
+	divr.appendChild(ifr);
+	fs.appendChild(divr);
+	element.textContent="";
+	element.appendChild(fs);
+	addClose(element.firstChild.firstChild);
 }
 
 window.addEventListener("load", function() {

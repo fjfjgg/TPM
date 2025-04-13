@@ -53,7 +53,7 @@ import es.us.dit.lti.servlet.UploadedFile;
  *
  * @author Francisco José Fernández Jiménez
  */
-public class ToolDao {
+public final class ToolDao {
 	/**
 	 * Logger.
 	 */
@@ -409,12 +409,15 @@ public class ToolDao {
 	 * @param tool            tool data
 	 * @param correctorFile   corrector file
 	 * @param descriptionFile user description file
+	 * @param extraZipFile    additional user zip file with the files referenced by
+	 *                        the description file
 	 * @return true if successful
 	 * @throws FileAlreadyExistsException when a tool with the same name exists
 	 * @throws FileSystemException        when it could not write files
 	 */
 	public static synchronized boolean create(MgmtUser user, Tool tool, UploadedFile correctorFile,
-			UploadedFile descriptionFile) throws FileAlreadyExistsException, FileSystemException {
+			UploadedFile descriptionFile, UploadedFile extraZipFile)
+			throws FileAlreadyExistsException, FileSystemException {
 
 		boolean result = true;
 		final String toolName = tool.getName();
@@ -433,7 +436,7 @@ public class ToolDao {
 		}
 
 		// Modifying files and directories.
-		if (!tool.createToolFiles(correctorFile, descriptionFile)) {
+		if (!tool.createToolFiles(correctorFile, descriptionFile, extraZipFile)) {
 			throw new FileSystemException(null);
 		}
 
@@ -564,12 +567,15 @@ public class ToolDao {
 	 * @param oldName         old name
 	 * @param correctorFile   corrector file
 	 * @param descriptionFile description file
+	 * @param extraZipFile    additional user zip file with the files referenced by
+	 *                        the description file
 	 * @return true if successful
 	 * @throws FileAlreadyExistsException when a tool with the same name exists
 	 * @throws FileSystemException        when it could not write files
 	 */
 	public static synchronized boolean update(Tool tool, String oldName, UploadedFile correctorFile,
-			UploadedFile descriptionFile) throws FileAlreadyExistsException, FileSystemException {
+			UploadedFile descriptionFile, UploadedFile extraZipFile)
+			throws FileAlreadyExistsException, FileSystemException {
 
 		// Get the parameters of the tool. Check that the mandatory ones are there.
 		if (tool.getName() == null || tool.getName().isEmpty() || tool.getDeliveryPassword() == null
@@ -580,7 +586,7 @@ public class ToolDao {
 
 		// Does the old tool exist?
 		final Tool oldTool = get(oldName);
-		if (oldTool == null || !oldTool.createToolFiles(null, null)) {
+		if (oldTool == null || !oldTool.createToolFiles(null, null, null)) {
 			logger.error("The old tool either does not exist or does not have the directories created.");
 			throw new FileSystemException(null);
 		}
@@ -588,7 +594,7 @@ public class ToolDao {
 		final String newToolTitle = tool.getName();
 
 		final boolean changeName = !oldName.equals(tool.getName());
-		final boolean changeFiles = correctorFile != null || descriptionFile != null;
+		final boolean changeFiles = correctorFile != null || descriptionFile != null || extraZipFile != null;
 		final boolean changeOthers = !oldTool.equalsExceptName(tool);
 		final boolean changeCounter = tool.getCounter() >= 0 && tool.getCounter() != oldTool.getCounter();
 		if (changeName) {
@@ -625,7 +631,7 @@ public class ToolDao {
 			}
 		}
 		if (changeFiles) {
-			if (tool.createToolFiles(correctorFile, descriptionFile)) {
+			if (tool.createToolFiles(correctorFile, descriptionFile, extraZipFile)) {
 				// something may have been created
 				filesCopied = true;
 			} else {

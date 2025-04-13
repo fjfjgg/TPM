@@ -57,7 +57,7 @@ public class DownloadToolServlet extends HttpServlet {
 	/**
 	 * Logger.
 	 */
-	private static final Logger logger = LoggerFactory.getLogger(DisassociateServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(DownloadToolServlet.class);
 	/**
 	 * Buffer size to send response.
 	 */

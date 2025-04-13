@@ -29,7 +29,7 @@ import java.time.format.DateTimeFormatter;
  * @author Francisco José Fernández Jiménez.
  * @version 1.0
  */
-public class Settings {
+public final class Settings {
 
 	/**
 	 * Date and time formatter for instants.

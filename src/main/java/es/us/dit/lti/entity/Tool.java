@@ -20,6 +20,8 @@
 package es.us.dit.lti.entity;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +32,10 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +85,7 @@ public class Tool extends UpdateRecordEntity {
 	/**
 	 * Whether the tool is enabled or not.
 	 */
-	private boolean enabled;
+	private volatile boolean enabled;
 	/**
 	 * If the tool is enabled, enable start date.
 	 */
@@ -92,7 +97,7 @@ public class Tool extends UpdateRecordEntity {
 	/**
 	 * If the writing of scores/outcomes on the consumer is allowed.
 	 */
-	private boolean outcome;
+	private volatile boolean outcome;
 	/**
 	 * Extra arguments to pass to the corrector.
 	 */
@@ -100,11 +105,11 @@ public class Tool extends UpdateRecordEntity {
 	/**
 	 * Assessment counter.
 	 */
-	private int counter;
+	private volatile int counter;
 	/**
 	 * MgmtUserType code, used in a user's tool listings.
 	 */
-	private int userTypeCode;
+	private volatile int userTypeCode;
 	/**
 	 * Tool runner userTypeCode.
 	 */
@@ -144,6 +149,14 @@ public class Tool extends UpdateRecordEntity {
 	 * Tool description HTML file for users.
 	 */
 	private String descriptionPath;
+	/**
+	 * Extra ZIP file path with the files referenced by the description file.
+	 */
+	private String extraZipPath;
+	/**
+	 * Tool extra folder path with the files referenced by the description file.
+	 */
+	private String extraPath;
 
 	/**
 	 * Gets the MgmtUserType code, used in a user's tool listings.
@@ -552,6 +565,30 @@ public class Tool extends UpdateRecordEntity {
 	}
 
 	/**
+	 * Gets the tool extra folder path.
+	 *
+	 * @return the tool extra folder path
+	 */
+	public String getToolExtraPath() {
+		if (extraPath == null) {
+			extraPath = getToolPath() + File.separator + "extra";
+		}
+		return extraPath;
+	}
+	
+	/**
+	 * Gets the extra zip path.
+	 *
+	 * @return the extra zip path
+	 */
+	public String getExtraZipPath() {
+		if (extraZipPath == null) {
+			extraZipPath = getToolPath() + File.separator + "extra.zip";
+		}
+		return extraZipPath;
+	}
+
+	/**
 	 * Gets the corrector executable/configuration file path.
 	 *
 	 * @return the corrector executable/configuration file path
@@ -604,8 +641,10 @@ public class Tool extends UpdateRecordEntity {
 	public boolean deleteToolFileBackups() {
 		final File correctorBck = new File(getCorrectorPath() + FILE_BACKUP_SUFFIX);
 		final File descriptionBck = new File(getDescriptionPath() + FILE_BACKUP_SUFFIX);
+		final File extraZipBck = new File(getExtraZipPath() + FILE_BACKUP_SUFFIX);
 		boolean bckCorrectorDeleted = false;
 		boolean bckDescriptionDeleted = false;
+		boolean bckExtraZipDeleted = false;
 		if (correctorBck.exists()) {
 			bckCorrectorDeleted = correctorBck.delete();
 			if (!bckCorrectorDeleted) {
@@ -622,8 +661,15 @@ public class Tool extends UpdateRecordEntity {
 		} else {
 			bckDescriptionDeleted = true;
 		}
-
-		return bckCorrectorDeleted && bckDescriptionDeleted;
+		if (extraZipBck.exists()) {
+			bckExtraZipDeleted = extraZipBck.delete();
+			if (!bckExtraZipDeleted) {
+				logger.error("Error deleting backup {}", extraZipBck.getPath());
+			}
+		} else {
+			bckExtraZipDeleted = true;
+		}
+		return bckCorrectorDeleted && bckDescriptionDeleted && bckExtraZipDeleted;
 	}
 
 	/**
@@ -636,8 +682,11 @@ public class Tool extends UpdateRecordEntity {
 		final File correctorBck = new File(correctorFile.getPath() + FILE_BACKUP_SUFFIX);
 		final File descriptionFile = new File(getDescriptionPath());
 		final File descriptionBck = new File(descriptionFile.getPath() + FILE_BACKUP_SUFFIX);
+		final File extraZipFile = new File(getExtraZipPath());
+		final File extraZipBck = new File(extraZipFile.getPath() + FILE_BACKUP_SUFFIX);
 		boolean correctorRestored = false;
 		boolean descriptionRestored = false;
+		boolean extraRestored = true;
 		if (correctorBck.exists()) {
 			try {
 				Files.copy(correctorBck.toPath(), correctorFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
@@ -662,10 +711,31 @@ public class Tool extends UpdateRecordEntity {
 			} catch (final IOException e) {
 				logger.error("Error restoring description backup.");
 			}
-
 		}
-
-		return correctorRestored && descriptionRestored;
+		if (extraZipBck.exists()) {
+			extraRestored = false;
+			try {
+				Files.copy(extraZipBck.toPath(), extraZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
+						StandardCopyOption.COPY_ATTRIBUTES);
+				if (!extraZipBck.delete()) {
+					logger.error("Error deleting extra zip backup.");
+				}
+				// Try to delete extra folder
+				final File dir = new File(getToolExtraPath());
+				if (dir.exists() && dir.isDirectory()) {
+					FileUtils.deleteDirectory(dir);
+					// if something is deleted before giving an error,
+					// we will not be able to recover it
+				}
+				// Create extra folder and unzip
+				if (!dir.exists() && !dir.mkdirs()) {
+					extraRestored = unzipFile(extraZipFile, dir);
+				}
+			} catch (final IOException e) {
+				logger.error("Error restoring extra zip backup.");
+			}
+		}
+		return correctorRestored && descriptionRestored && extraRestored;
 	}
 
 	/**
@@ -715,10 +785,12 @@ public class Tool extends UpdateRecordEntity {
 	 * Create the files associated with this tool from FileItem.
 	 *
 	 * @param correctorFile   corrector file
-	 * @param descriptionFile description file
+	 * @param extraZipFile    additional user zip file with the files referenced by
+	 *                        the description file
 	 * @return true if they have been copied
 	 */
-	public boolean createToolFiles(UploadedFile correctorFile, UploadedFile descriptionFile) {
+	public boolean createToolFiles(UploadedFile correctorFile, UploadedFile descriptionFile,
+			UploadedFile extraZipFile) {
 		boolean result = true;
 
 		// Create tool directory.
@@ -735,6 +807,14 @@ public class Tool extends UpdateRecordEntity {
 			}
 		}
 
+		// Create extra folder.
+		if (result) {
+			folder = new File(getToolExtraPath());
+			if (!folder.exists() && !folder.mkdirs()) {
+				result = false;
+			}
+		}
+
 		// Copy corrector file.
 		if (result && correctorFile != null && !writeToolFile(getCorrectorPath(), correctorFile, true)) {
 			result = false;
@@ -743,9 +823,79 @@ public class Tool extends UpdateRecordEntity {
 		// Copy description file.
 		if (result && descriptionFile != null && !writeToolFile(getDescriptionPath(), descriptionFile, false)) {
 			result = false;
+		}
+		
+		// Copy extra zip file
+		if (result && extraZipFile != null) {
+			if (writeToolFile(getExtraZipPath(), extraZipFile, false)) {
+				// Try to delete extra folder
+				final File dir = new File(getToolExtraPath());
+				if (dir.exists() && dir.isDirectory()) {
+					try {
+						FileUtils.deleteDirectory(dir);
+					} catch (IOException e) {
+						// Ignore because it is optional
+						logger.warn("Error deleting : {}", dir.getPath());
+					}
+				}
+				result = unzipFile(new File(getExtraZipPath()), new File(getToolExtraPath()));
+			} else {
+				result = false;
+			}
+		}
+
+		if (!result) {
 			// restore backups
 			restoreToolFileBackups();
 		}
 		return result;
 	}
+	
+	/**
+	 * Unzip ZIP file into destination directory.
+	 * 
+	 * @param zip the ZIP file
+	 * @param destination the destination directory
+	 * @return true if no error
+	 */
+	public boolean unzipFile(File zip, File destination) {
+		boolean res = false;
+		final byte[] buffer = new byte[8192];
+		try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zip))) {
+			ZipEntry zipEntry = zipInputStream.getNextEntry();
+			while (zipEntry != null) {
+				// @see https://snyk.io/research/zip-slip-vulnerability
+				final File destFile = new File(destination, zipEntry.getName());
+				String destDirPath = destination.getCanonicalPath();
+				String destFilePath = destFile.getCanonicalPath();
+				if (!destFilePath.startsWith(destDirPath + File.separator)) {
+					throw new IOException("Security Error: path is outside of destination: " + zipEntry.getName());
+				}
+				if (zipEntry.isDirectory()) {
+					if (!destFile.isDirectory() && !destFile.mkdirs()) {
+						throw new IOException("Error creating directory " + destFile);
+					}
+				} else {
+					File parent = destFile.getParentFile();
+					if (!parent.isDirectory() && !parent.mkdirs()) {
+						throw new IOException("Error creating directory " + parent);
+					}
+					try (FileOutputStream fos = new FileOutputStream(destFile)) {
+						int len;
+						while ((len = zipInputStream.read(buffer)) > 0) {
+							fos.write(buffer, 0, len);
+						}
+					}
+				}
+				zipEntry = zipInputStream.getNextEntry();
+			}
+			zipInputStream.closeEntry();
+			res = true;
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			res = false;
+		}
+		return res;
+	}
+	
 }

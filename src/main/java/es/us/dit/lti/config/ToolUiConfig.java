@@ -128,6 +128,11 @@ public class ToolUiConfig implements Serializable {
 	private boolean maxAttemptsDependsOnFilenames = false;
 
 	/**
+	 * MIME type of output (default is text/html")
+	 */
+	private String outputMimeType = "text/html";
+
+	/**
 	 * Ask for the delivery password before showing the page.
 	 */
 	private boolean passwordProtected = false;
@@ -460,6 +465,24 @@ public class ToolUiConfig implements Serializable {
 	 */
 	public void setMaxAttemptsDependsOnFilenames(boolean maxAttemptsDependsOnFilenames) {
 		this.maxAttemptsDependsOnFilenames = maxAttemptsDependsOnFilenames;
+	}
+
+	/**
+	 * Gets the output MIME type.
+	 * 
+	 * @return the outputMimeType output MIME type
+	 */
+	public String getOutputMimeType() {
+		return outputMimeType;
+	}
+
+	/**
+	 * Sets the output MIME type.
+	 * 
+	 * @param outputMimeType new value
+	 */
+	public void setOutputMimeType(String outputMimeType) {
+		this.outputMimeType = outputMimeType;
 	}
 
 	/**

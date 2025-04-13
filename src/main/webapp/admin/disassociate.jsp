@@ -24,7 +24,7 @@ if (tool != null && ToolDao.getToolUserType(mgmtUser, tool) == MgmtUserType.ADMI
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
 	<div class="h1container dialog">
 		<h1>
-			<a href="../user/tools.jsp"><span class="material-icons bcerrar">close</span></a>
+			<a href="../user/tools.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a>
 			Desasociar usuarios
 		</h1>
 		<p>Seleccione los usuarios que desea desasociar de la

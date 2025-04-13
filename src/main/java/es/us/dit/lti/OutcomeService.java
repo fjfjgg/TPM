@@ -77,7 +77,7 @@ import net.oauth.OAuthMessage;
  * @author Francisco José Fernández Jiménez
  *
  */
-public class OutcomeService {
+public final class OutcomeService {
 	/**
 	 * Logger.
 	 */

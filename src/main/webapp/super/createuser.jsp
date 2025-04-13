@@ -41,7 +41,7 @@ pageContext.setAttribute("editMode", editMode);
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
 	<div class="h1container dialog">
 		<h1>
-			<a href="../super/users.jsp"><span class="material-icons bcerrar">close</span></a> 
+			<a href="../super/users.jsp" accesskey="x"><span class="material-icons bcerrar">close</span></a> 
 				Datos del usuario
 		</h1>
 		<form method="post" id="addForm" action="${formAction}" accept-charset="UTF-8">

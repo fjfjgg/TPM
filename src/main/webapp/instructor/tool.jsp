@@ -13,7 +13,7 @@
 <%@page import="java.nio.charset.StandardCharsets,org.apache.commons.io.output.WriterOutputStream"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
-<%@taglib prefix="e" uri="https://www.owasp.org/index.php/OWASP_Java_Encoder_Project" %>
+<%@taglib prefix="e" uri="owasp.encoder.jakarta"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %> 
 <jsp:useBean id="text" type="es.us.dit.lti.MessageMap" scope="session" />
 <%
@@ -76,11 +76,11 @@ if (tool != null && tool.getName() != null) {
 	}
 	if (cssPaths != null) {
 	  for (String cssString : cssPaths.split(",")) {	%>
-<link rel="stylesheet" type="text/css" href="<%=Encode.forHtmlAttribute(cssString)%>" />
+	<link rel="stylesheet" type="text/css" href="<%=Encode.forHtmlAttribute(cssString)%>" />
 	<%
 	  }
 	}
-	 %>
+	%>
 	<link rel="stylesheet" type="text/css" href="../css/material-icons.css" />
 	<link rel="stylesheet" type="text/css" href="../learner/css/tool.css" />
 	<link rel="stylesheet" type="text/css" href="css/tool-instructor.css" />
@@ -130,8 +130,8 @@ if (tool != null && tool.getName() != null) {
 				<div id="editmodeWrapper">
 					<div id="content" class="contentBox">
 						<div id="pageTitleDiv" class="pageTitle clearfix ">
-							<div id="pageTitleBar" class='pageTitleIcon' tabindex="0">
-						  		<h1 id="pageTitleHeader" tabindex="-1" ><span id="pageTitleText">
+							<div id="pageTitleBar" class='pageTitleIcon'>
+						  		<h1 id="pageTitleHeader"><span id="pageTitleText">
 						  			<span style="color:#000000;"><%=Encode.forHtmlContent(titulo) %></span>  </span></h1>
 						  		<% if (Settings.getAppName()== null || Settings.getAppName().isEmpty()) { %>
 						  		<p><fmt:message key="T_NOMBRE_LTI"/> - Departamento de Ingeniería Telemática - Universidad de Sevilla</p>
@@ -153,6 +153,7 @@ if (tool != null && tool.getName() != null) {
 							<fieldset id="description" class="infocontainer" data-toggle="parentdescription">
 								<legend><fmt:message key="T_DESCRIPCION"/></legend>
 								<%
+								session.setAttribute("extraFileAuthorized", true);
 								try (FileInputStream br = new FileInputStream(tool.getDescriptionPath());) {
 									WriterOutputStream wos = WriterOutputStream.builder().setWriter(out)
 											   .setCharset(StandardCharsets.UTF_8).get();
@@ -167,19 +168,19 @@ if (tool != null && tool.getName() != null) {
 							</fieldset>
 							<fieldset id="instructor" class="infocontainer" data-toggle="parentinstructor">
 								<legend><fmt:message key="T_INFO_PROFESOR"/></legend>
-								<p id="tool"><label><fmt:message key="T_HERRAMIENTA"/>:</label> ${e:forHtml(ts.tool.name)}</p>
-								<p id="passt"><label><fmt:message key="T_CLAVE_ENTREGA"/>:</label> <span id="instructorpass">${e:forHtml(ts.tool.deliveryPassword)}</span></p>
-							    <p id="outcome"><label><fmt:message key="T_SUBIR_NOTA"/>:</label> ${ts.outcomeAllowed ? text['T_SI'] : text['T_NO']}</p>
-							    <p id="counter"><label><fmt:message key="T_CONTADOR_USO"/>:</label> ${ts.tool.counter }</p>
+								<p id="tool"><b><fmt:message key="T_HERRAMIENTA"/>:</b> ${e:forHtml(ts.tool.name)}</p>
+								<p id="passt"><b><fmt:message key="T_CLAVE_ENTREGA"/>:</b> <span id="instructorpass">${e:forHtml(ts.tool.deliveryPassword)}</span></p>
+							    <p id="outcome"><b><fmt:message key="T_SUBIR_NOTA"/>:</b> ${ts.outcomeAllowed ? text['T_SI'] : text['T_NO']}</p>
+							    <p id="counter"><b><fmt:message key="T_CONTADOR_USO"/>:</b> ${ts.tool.counter }</p>
 							    <%
 							    if (!tool.isEnabled() || !ts.getToolKey().isEnabled()) {
 									out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA") + "</p>");
 								} else {
 									if (tool.getEnabledFrom() != null) { %>
-								<p id="enabledFrom" class='textCentered'><label><fmt:message key="T_HABILITADA_DESDE"/>: </label> <fmt:formatDate type="both" value="${ts.tool.enabledFrom.time}"/></p>
+								<p id="enabledFrom" class='textCentered'><b><fmt:message key="T_HABILITADA_DESDE"/>: </b> <fmt:formatDate type="both" value="${ts.tool.enabledFrom.time}"/></p>
 									<% }
 									if (tool. getEnabledUntil() != null) { %>
-								<p id="enabledUntil" class='textCentered'><label><fmt:message key="T_HABILITADA_HASTA"/>: </label> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/></p>
+								<p id="enabledUntil" class='textCentered'><b><fmt:message key="T_HABILITADA_HASTA"/>: </b> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/></p>
 									<% }
 									if (!tool.isEnabledByDate()) {
 										out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA_FECHA") + "</p>");
@@ -212,10 +213,10 @@ if (tool != null && tool.getName() != null) {
 								<p id="parentattempts" class="toggleButton">
 									<a id="showattempts" title="<fmt:message key="T_MOSTRAR_INTENTOS"/>" class="genericButton"
 										data-toggle="attempts">
-									<span class="material-icons">restore</span></a></p>								
+									<span class="material-icons" accessKey="p">restore</span></a></p>								
 							<%} %>
 							<p id="parentassessment" class="toggleButton hidden">
-									<a id="showassessment" title="<fmt:message key="T_MOSTRAR_RESULTADOS"/>" class="genericButton" data-toggle="assessment">
+									<a id="showassessment" title="<fmt:message key="T_MOSTRAR_RESULTADOS"/>" class="genericButton" data-toggle="resultoutput">
 									<span class="material-icons">assessment</span></a></p>
 							<p id="parentdelivery" class="toggleButton hidden">
 									<a id="showdelivery" title="<fmt:message key="T_MOSTRAR_FORMULARIO"/>" class="genericButton" data-toggle="fsdelivery">
@@ -257,7 +258,7 @@ if (tool != null && tool.getName() != null) {
 						</div>
 						<p id="plogout" class="">
 							<a id="alogout" title="<fmt:message key="T_SALIR"/>" class="genericButton" href="${ts.ltiReturnUrl}"> <span
-								class="material-icons">logout</span></a>
+								class="material-icons" accesskey="x">logout</span></a>
 						</p>
 					</div>
 				</div>
