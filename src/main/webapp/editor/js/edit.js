@@ -105,7 +105,7 @@ function showModal(e) {
     let captionText = document.getElementById("src-modal-caption");
     let saveEditor = document.getElementById("saveEditor");
     document.getElementById('src-modal').style.display = "block";
-    captionText.innerHTML = this.dataset.name;
+    captionText.textContent = this.dataset.name;
     if (saveEditor) {
 		saveEditor.dataset.id=this.dataset.id;
 		saveEditor.onclick=saveTextEditor;

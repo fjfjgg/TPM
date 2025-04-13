@@ -61,7 +61,12 @@ function deleteAttempt(event) {
 			    }
 			})
 			.then(() => {
-				element.innerHTML = "<br /><p class='avisoborrado'>" + attemptid + " "+texts.attemptDeleted+"</p>";
+				element.textContent = "";
+				let p = document.createElement("p");
+				p.className = "avisoborrado";
+				p.textContent = attemptid + " " + texts.attemptDeleted;
+				element.appendChild(document.createElement("br"));
+				element.appendChild(p);
 				let attempts = fila.parentNode.parentElement.attempts
 				for(let i = 0; i < attempts.length; i++) {
 				    if(attempts[i].id == attemptid) {
@@ -76,7 +81,12 @@ function deleteAttempt(event) {
 				document.getElementById("attemptcounter").textContent=counter;
 			})
 			.catch(error => {
-				element.innerHTML = "<br /><p class='avisoborrado'>" + attemptid + " "+texts.attemptErrorDelete+"</p>";
+				element.textContent = "";
+				let pError = document.createElement("p");
+				pError.className = "avisoborrado";
+				pError.textContent = attemptid + " " + texts.attemptErrorDelete;
+				element.appendChild(document.createElement("br"));
+				element.appendChild(pError);
 				console.log(error);
 			});
 	}
