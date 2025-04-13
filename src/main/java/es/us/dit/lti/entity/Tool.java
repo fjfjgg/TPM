@@ -563,7 +563,7 @@ public class Tool extends UpdateRecordEntity {
 		}
 		return dataPath;
 	}
-
+	
 	/**
 	 * Gets the tool extra folder path.
 	 *
@@ -785,6 +785,7 @@ public class Tool extends UpdateRecordEntity {
 	 * Create the files associated with this tool from FileItem.
 	 *
 	 * @param correctorFile   corrector file
+	 * @param descriptionFile description file in HTML
 	 * @param extraZipFile    additional user zip file with the files referenced by
 	 *                        the description file
 	 * @return true if they have been copied
@@ -806,7 +807,7 @@ public class Tool extends UpdateRecordEntity {
 				result = false;
 			}
 		}
-
+		
 		// Create extra folder.
 		if (result) {
 			folder = new File(getToolExtraPath());
