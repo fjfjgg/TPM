@@ -21,7 +21,6 @@ package es.us.dit.lti;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -106,33 +105,15 @@ public final class OutcomeService {
 	public static boolean writeOutcome(ResourceUser user, ToolKey toolKey, String value) {
 		boolean result = false;
 		final String url = user.getResourceLink().getOutcomeServiceUrl();
-		if (url == null || url.length() == 0) {
-			return result;
+		if (url != null && !url.isEmpty()) {
+			if (value == null) {
+				value = "";
+			}
+			if (doServiceRequest(url, "replaceResultRequest", user.getResultSourceId(), value,
+					toolKey.getKey(), toolKey.getSecret()) != null) {
+				result = true;
+			}
 		}
-		final String sourcedId = user.getResultSourceId();
-		if (value == null) {
-			value = "";
-		}
-		final StringBuilder xml = new StringBuilder();
-		xml.append("    <replaceResultRequest>\n");
-		xml.append("      <resultRecord>\n");
-		xml.append("        <sourcedGUID>\n");
-		xml.append("          <sourcedId>").append(sourcedId).append("</sourcedId>\n");
-		xml.append("        </sourcedGUID>\n");
-		xml.append("        <result>\n");
-		xml.append("          <resultScore>\n");
-		xml.append("            <language>en-US</language>\n");
-		xml.append("            <textString>").append(value).append("</textString>\n");
-		xml.append("          </resultScore>\n");
-		xml.append("        </result>\n");
-		xml.append("      </resultRecord>\n");
-		xml.append("    </replaceResultRequest>\n");
-
-		if (doServiceRequest(url, xml.toString(), toolKey.getKey(), toolKey.getSecret()) != null) {
-			result = true;
-
-		}
-
 		return result;
 	}
 
@@ -146,24 +127,10 @@ public final class OutcomeService {
 	public static boolean deleteOutcome(ResourceUser user, ToolKey toolKey) {
 		boolean result = false;
 		final String url = user.getResourceLink().getOutcomeServiceUrl();
-		if (url == null || url.length() == 0) {
-			return result;
-		}
-		final String sourcedId = user.getResultSourceId();
-		final StringBuilder xml = new StringBuilder();
-		xml.append("    <deleteResultRequest>\n");
-		xml.append("      <resultRecord>\n");
-		xml.append("        <sourcedGUID>\n");
-		xml.append("          <sourcedId>").append(sourcedId).append("</sourcedId>\n");
-		xml.append("        </sourcedGUID>\n");
-		xml.append("      </resultRecord>\n");
-		xml.append("    </deleteResultRequest>\n");
-
-		if (doServiceRequest(url, xml.toString(), toolKey.getKey(), toolKey.getSecret()) != null) {
+		if (url != null && !url.isEmpty() && doServiceRequest(url, "deleteResultRequest", user.getResultSourceId(),
+				null, toolKey.getKey(), toolKey.getSecret()) != null) {
 			result = true;
-
 		}
-
 		return result;
 	}
 
@@ -177,27 +144,16 @@ public final class OutcomeService {
 	public static String readOutcome(ResourceUser user, ToolKey toolKey) {
 		String result = null;
 		final String url = user.getResourceLink().getOutcomeServiceUrl();
-		if (url == null || url.length() == 0) {
-			return result;
-		}
-		final String sourcedId = user.getResultSourceId();
-		final StringBuilder xml = new StringBuilder();
-		xml.append("    <readResultRequest>\n");
-		xml.append("      <resultRecord>\n");
-		xml.append("        <sourcedGUID>\n");
-		xml.append("          <sourcedId>").append(sourcedId).append("</sourcedId>\n");
-		xml.append("        </sourcedGUID>\n");
-		xml.append("      </resultRecord>\n");
-		xml.append("    </readResultRequest>\n");
-
-		final Document xmlDoc = doServiceRequest(url, xml.toString(), toolKey.getKey(), toolKey.getSecret());
-		if (xmlDoc != null) {
-			final Element element = getXmlChild(xmlDoc.getRootElement(), "textString");
-			if (element != null) {
-				result = element.getText();
+		if (url != null && !url.isEmpty()) {
+			final Document xmlDoc = doServiceRequest(url, "readResultRequest", user.getResultSourceId(), null,
+					toolKey.getKey(), toolKey.getSecret());
+			if (xmlDoc != null) {
+				final Element element = getXmlChild(xmlDoc.getRootElement(), "textString");
+				if (element != null) {
+					result = element.getText();
+				}
 			}
 		}
-
 		return result;
 	}
 
@@ -251,13 +207,15 @@ public final class OutcomeService {
 	 * Makes a LTI 1.1 service request.
 	 *
 	 * @param url    LTI outcome service URL
-	 * @param xml    request body as XML
+	 * @param requestType request body type
+	 * @param sourcedId   sourcedId of result record
+	 * @param value       result value of resultRecord
 	 * @param key    tool key
 	 * @param secret tool secret to authenticate request
 	 * @return response of the tool consumer as XML document
 	 */
-	private static Document doServiceRequest(String url, String xml, String key, String secret) {
-		Document xmlDoc = null;
+	private static Document doServiceRequest(String url, String requestType, String sourcedId, String value, String key,
+			String secret) {
 		final String messageId = UUID.randomUUID().toString();
 		final StringBuilder xmlRequest = new StringBuilder();
 		xmlRequest.append("<?xml version = \"1.0\" encoding = \"UTF-8\"?>\n");
@@ -270,7 +228,21 @@ public final class OutcomeService {
 		xmlRequest.append("    </imsx_POXRequestHeaderInfo>\n");
 		xmlRequest.append("  </imsx_POXHeader>\n");
 		xmlRequest.append("  <imsx_POXBody>\n");
-		xmlRequest.append(xml);
+		xmlRequest.append("    <").append(requestType).append(">\n");
+		xmlRequest.append("      <resultRecord>\n");
+		xmlRequest.append("        <sourcedGUID>\n");
+		xmlRequest.append("          <sourcedId>").append(sourcedId).append("</sourcedId>\n");
+		xmlRequest.append("        </sourcedGUID>\n");
+		if (value != null) {
+			xmlRequest.append("        <result>\n");
+			xmlRequest.append("          <resultScore>\n");
+			xmlRequest.append("            <language>en-US</language>\n");
+			xmlRequest.append("            <textString>").append(value).append("</textString>\n");
+			xmlRequest.append("          </resultScore>\n");
+			xmlRequest.append("        </result>\n");
+		}
+		xmlRequest.append("      </resultRecord>\n");
+		xmlRequest.append("    </").append(requestType).append(">\n");
 		xmlRequest.append("  </imsx_POXBody>\n");
 		xmlRequest.append("</imsx_POXEnvelopeRequest>\n");
 
@@ -314,11 +286,7 @@ public final class OutcomeService {
 		final String response = sendRequest(url, getHttpParams(params), header, entity);
 
 		// Process response
-		if (response != null) {
-			xmlDoc = processResponse(response);
-		}
-
-		return xmlDoc;
+		return response != null ? processResponse(response) : null;
 	}
 
 	/**
@@ -399,13 +367,7 @@ public final class OutcomeService {
 			if (entity != null) {
 				httpPost.setEntity(entity);
 			} else {
-				try {
-					httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-				} catch (final UnsupportedEncodingException e1) {
-					// UTF-8 must be supported
-					logger.error("UTF-8", e1);
-				}
-
+				httpPost.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
 			}
 			if (header != null) {
 				for (final Entry<String, String> entry : header.entrySet()) {

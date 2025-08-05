@@ -78,11 +78,11 @@ public enum ToolRunnerType {
 	 */
 	public static ToolRunnerType fromInt(int type) {
 		// Decode type
-		for (final ToolRunnerType t : ToolRunnerType.values()) {
+		for (final ToolRunnerType t : values()) {
 			if (type == t.getCode()) {
 				return t;
 			}
 		}
-		return ToolRunnerType.UNKNOWN;
+		return UNKNOWN;
 	}
 }

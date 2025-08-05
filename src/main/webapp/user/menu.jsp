@@ -3,7 +3,11 @@
 <%@page import="es.us.dit.lti.entity.Settings"%>
 <%@page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %> 
 <jsp:useBean id="text" type="es.us.dit.lti.MessageMap" scope="session" />
+<fmt:setLocale value="${text.locale}"/>
+<fmt:setBundle basename="messages"/>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,17 +19,10 @@
 <body>
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
 	<div class="h1container">
-		<%
-		MgmtUser currentUser = (MgmtUser) session.getAttribute("mgmtUser");
-		//Vemos si hay algún mensaje de alguna pantalla anterior	
-		if (session.getAttribute(Settings.PENDING_MSG_ATTRIB) != null) {
-			%>
-			<h3><%=text.get(session.getAttribute(Settings.PENDING_MSG_ATTRIB))%></h3>
-			<%
-			session.setAttribute(Settings.PENDING_MSG_ATTRIB, null);
-		}
-		%>
+		<c:if test="${sessionScope.pendingMessage != null}">
+			<h3><fmt:message key="${sessionScope.pendingMessage}"/></h3>
+			<c:remove var="pendingMessage" scope="session"/>
+		</c:if>
 	</div>
-	
 </body>
 </html>

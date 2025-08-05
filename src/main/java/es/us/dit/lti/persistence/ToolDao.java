@@ -599,7 +599,7 @@ public final class ToolDao {
 		final boolean changeCounter = tool.getCounter() >= 0 && tool.getCounter() != oldTool.getCounter();
 		if (changeName) {
 			// Verify that there is no tool with the new name
-			if (ToolDao.get(tool.getName()) != null) {
+			if (get(tool.getName()) != null) {
 				throw new FileAlreadyExistsException(null);
 			}
 			// Verify that the new directories do not exist
@@ -610,7 +610,7 @@ public final class ToolDao {
 		}
 
 		// Remove cache
-		for (final String key : ToolDao.getAllKeys(oldTool)) {
+		for (final String key : getAllKeys(oldTool)) {
 			ToolKeyDao.deleteCache(key);
 		}
 		cache.remove(oldTool.getName());
@@ -851,7 +851,7 @@ public final class ToolDao {
 			logger.error(ERROR_AUTOCOMMIT);
 		}
 		// Remove cache
-		for (final String key : ToolDao.getAllKeys(tool)) {
+		for (final String key : getAllKeys(tool)) {
 			ToolKeyDao.deleteCache(key);
 		}
 		cache.remove(tool.getName());

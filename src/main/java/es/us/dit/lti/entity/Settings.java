@@ -146,14 +146,14 @@ public final class Settings {
 	 */
 	public static String printString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("\nAPP_NAME: [" + Settings.appName + "]\n");
-		sb.append("DATASOURCE_MODE: [" + Settings.datasourceMode + "]\n");
-		sb.append("TOOLS_FOLDER: [" + Settings.toolsFolder + "]\n");
-		sb.append("MAX_UPLOAD_SIZE: [" + Settings.maxUploadSize + "]\n");
-		sb.append("CONCURRENT_USERS: [" + Settings.concurrentUsers + "]\n");
-		sb.append("CORRECTOR_FILENAME: [" + Settings.correctorFilename + "]\n");
-		sb.append("DEFAULT_CSS_PATH: [" + Settings.defaultCssPath + "]\n");
-		sb.append("NOTICE: [" + Settings.notice + "]\n");
+		sb.append("\nAPP_NAME: [" + appName + "]\n");
+		sb.append("DATASOURCE_MODE: [" + datasourceMode + "]\n");
+		sb.append("TOOLS_FOLDER: [" + toolsFolder + "]\n");
+		sb.append("MAX_UPLOAD_SIZE: [" + maxUploadSize + "]\n");
+		sb.append("CONCURRENT_USERS: [" + concurrentUsers + "]\n");
+		sb.append("CORRECTOR_FILENAME: [" + correctorFilename + "]\n");
+		sb.append("DEFAULT_CSS_PATH: [" + defaultCssPath + "]\n");
+		sb.append("NOTICE: [" + notice + "]\n");
 		return sb.toString();
 	}
 

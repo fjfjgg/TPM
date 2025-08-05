@@ -27,7 +27,9 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -40,6 +42,7 @@ import es.us.dit.lti.entity.Attempt;
 import es.us.dit.lti.entity.Settings;
 import es.us.dit.lti.entity.Tool;
 import es.us.dit.lti.persistence.ToolAttemptDao;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -80,6 +83,31 @@ public class AttemptManagerServlet extends HttpServlet {
 	 */
 	private static final int DEFAULT_BUFFER_SIZE = 8192;
 
+	
+	private final Map<String, String> mimeToExt = new HashMap<>();
+	
+	/**
+	 * Init mimeToExtensionMap.
+	 * 
+	 * @see HttpServlet#init(ServletConfig config)
+	 */
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		mimeToExt.put("text/html", "html");
+		mimeToExt.put("text/plain", "txt");
+		mimeToExt.put("image/jpeg", "jpg");
+		mimeToExt.put("text/csv", "csv");
+		mimeToExt.put("application/pdf", "pdf");
+		mimeToExt.put("image/svg+xml", "svg");
+		mimeToExt.put("image/png", "png");
+		mimeToExt.put("image/gif", "gif");
+		mimeToExt.put("image/webp", "webp");
+		mimeToExt.put("application/xml", "xml");
+		mimeToExt.put("application/json", "json");
+	}
+	
+	
 	/**
 	 * Gets the file or result/output of an attempt.
 	 * 
@@ -208,7 +236,7 @@ public class AttemptManagerServlet extends HttpServlet {
 						}
 						// result/output
 						f = getFile(attempt, true);
-						if (f != null ) {
+						if (f != null) {
 							clean(f.getPath());
 						}
 						response.sendError(HttpServletResponse.SC_NO_CONTENT);
@@ -255,8 +283,6 @@ public class AttemptManagerServlet extends HttpServlet {
 					&& (tool.getToolUiConfig().isShowAttempts()
 							|| request.getServletPath().equals("/instructor/downloadattempts")
 									&& tool.getToolUiConfig().isManageAttempts());
-			final boolean forceConsumerId = request.getServletPath().equals("/learner/downloadattempts")
-					|| !tool.getToolUiConfig().isManageAttempts();
 			if (allowed) {
 				// Extract all the parameters and generate a list of files to add
 				final List<File> files = new ArrayList<>();
@@ -275,8 +301,10 @@ public class AttemptManagerServlet extends HttpServlet {
 						if (uid != null && cipheredSid != null) {
 							uid = URLDecoder.decode(uid, StandardCharsets.UTF_8);
 							final Attempt attempt = ToolAttemptDao.getBySecuredSid(cipheredSid, ts.getToolKey());
+							final boolean forceUserId = request.getServletPath().equals("/learner/downloadattempts")
+									|| !tool.getToolUiConfig().isManageAttempts();
 							if (attempt != null && (uid.equals(userId) && ts.getLtiResourceUser().getUser()
-									.getSid() == attempt.getResourceUser().getUser().getSid() || !forceConsumerId)) {
+									.getSid() == attempt.getResourceUser().getUser().getSid() || !forceUserId)) {
 								attempt.getResourceUser().getResourceLink().setTool(tool);
 								// user files
 								File f = getFile(attempt, false);
@@ -299,7 +327,9 @@ public class AttemptManagerServlet extends HttpServlet {
 					response.setContentType("application/zip");
 					response.setHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
 					try (ZipOutputStream output = new ZipOutputStream(response.getOutputStream());) {
-						zipFiles(files, output, tool.getToolDataPath().length());
+						// Find extension for output files
+						final String ext = mimeToExt.get(tool.getToolUiConfig().getOutputMimeType());
+						zipFiles(files, output, tool.getToolDataPath().length(), ext != null ? "." + ext : "");
 					}
 				} else {
 					response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -319,8 +349,9 @@ public class AttemptManagerServlet extends HttpServlet {
 	 * @param files list of files
 	 * @param zos output stream
 	 * @param prefixToRemove prefix to remove from file names
+	 * @param outputExt extension to add to the file name of output files
 	 */
-	private void zipFiles(List<File> files, ZipOutputStream zos, int prefixToRemove) {
+	private void zipFiles(List<File> files, ZipOutputStream zos, int prefixToRemove, String outputExt) {
 		try {
 			final byte[] readBuffer = new byte[DEFAULT_BUFFER_SIZE];
 			int bytesIn = 0;
@@ -330,7 +361,10 @@ public class AttemptManagerServlet extends HttpServlet {
 				// create a FileInputStream on top of f
 				try (FileInputStream fis = new FileInputStream(f);) {
 					// create a new zip entry
-					final ZipEntry anEntry = new ZipEntry(f.getPath().substring(prefixToRemove + 1));
+					final String path = f.getPath();
+					final boolean isOutput = path.endsWith(Settings.RESULT_EXT);
+					final ZipEntry anEntry = new ZipEntry(
+							path.substring(prefixToRemove + 1) + (isOutput ? outputExt : ""));
 					// place the zip entry in the ZipOutputStream object
 					zos.putNextEntry(anEntry);
 					// now write the content of the file to the ZipOutputStream

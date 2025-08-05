@@ -13,6 +13,10 @@ blockquote {
 	padding: 30px;
 }
 
+.h1container.dialog {
+	visibility: hidden;
+}
+
 h1 {
 	background: linear-gradient(to bottom, #c62050 5%, #881536 100%);
 	border-radius: 15px;

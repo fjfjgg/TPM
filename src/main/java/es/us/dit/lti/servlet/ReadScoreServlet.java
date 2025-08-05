@@ -76,18 +76,10 @@ public class ReadScoreServlet extends HttpServlet {
 			response.setContentType("text/plain");
 			try {
 				String score = getScore(ts);
-				try {
-					final float fScore = Float.parseFloat(score);
-					score = String.format("%.1f", fScore * 10);
-				} catch (final NumberFormatException e) {
-					// ignore
-					response.getWriter().append("Not float: ");
-				}
-
-				response.getWriter().append(score);
+				response.getWriter().append(formatScore(score));
 			} catch (final IOException e) {
 				// ignore
-				logger.error("IO Error.", e);
+				logger.error("Get IO Error.", e);
 			}
 
 		}
@@ -101,6 +93,27 @@ public class ReadScoreServlet extends HttpServlet {
 	 */
 	private String getScore(ToolSession ts) {
 		return OutcomeService.readOutcome(ts.getLtiResourceUser(), ts.getToolKey());
+	}
+	
+	/**
+	 * Format score.
+	 * 
+	 * @param score original value
+	 * @return score formatted
+	 */
+	private String formatScore(String score) {
+		if (score != null) {
+			try {
+				final float fScore = Float.parseFloat(score);
+				score = String.format("%.1f", fScore * 10);
+			} catch (final NumberFormatException e) {
+				// ignore
+				logger.error("Not float: {}", score);
+			}
+		} else {
+			score = "null";
+		}
+		return score;
 	}
 
 	/**
@@ -141,7 +154,7 @@ public class ReadScoreServlet extends HttpServlet {
 				if (rl != null && rl.getOutcomeServiceUrl() != null && !rl.getOutcomeServiceUrl().isEmpty()) {
 					// Check tk so avoid attempt sid reuse from different tk
 					final ScoreInfo info = new ScoreInfo();
-					info.setScore(OutcomeService.readOutcome(resUser, ts.getToolKey()));
+					info.setScore(formatScore(OutcomeService.readOutcome(resUser, ts.getToolKey())));
 					info.setResourceTitle(resUser.getResourceLink().getTitle());
 					info.setContextTitle("");
 					scores.add(info);

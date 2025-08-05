@@ -198,7 +198,10 @@ function send(formData) {
         } else {
           createResult(xmlhttp.responseText);
         }
+	  } else if (xmlhttp.status == 403) {
+		createResult("<p class='error'>"+texts.errorClosedSession+"</p>");
       } else {
+		console.log(xmlhttp.status);
         createResult("<p class='error'>"+texts.errorNoResponse+"</p>");
 	  }
     }
@@ -219,16 +222,14 @@ function createResult(text) {
 	let l = document.createElement("legend");
 	l.appendChild(document.createTextNode(texts.resultTitle));
 	fs.appendChild(l);
-	let divr = document.createElement("div");
-	divr.className = "resizer";
-	fs.appendChild(divr);
-	element.innerHTML="";
-	element.appendChild(fs);
-	divr.innerHTML+=text;
-	let ifr = divr.querySelector(".resized");
+	fs.innerHTML+=text;
+	let ifr = fs.querySelector(".resized");
 	if (ifr) {
 		ifr.onload = resizeFullHeight;
 	}
+	element.innerHTML="";
+	element.appendChild(fs);
+	
 	addClose(element.firstChild.firstChild);
 	if (typeof changeUser == "function") {
 		changeUser();
@@ -256,24 +257,22 @@ function addClose(legend, onclick) {
 
 function toggleHidden(event) {
 	let element = event.currentTarget;
-	let toHide;
-	let toShow;
-	let scroll = false;
+	let toggleButton;
+	let toggleContainer;
 	if (element.classList.contains('closefs')) {
-		toHide = element.parentNode.parentNode;
-		toShow = document.getElementById(toHide.dataset.toggle);
+		toggleContainer = element.parentNode.parentNode;
+		toggleButton = document.getElementById(toggleContainer.dataset.toggle);
 	} else {
-		toHide = element.parentNode;
-		toShow = document.getElementById(element.dataset.toggle);
-		scroll = true;
+		toggleButton = element.parentNode;
+		toggleContainer = document.getElementById(element.dataset.toggle);
 	}
-	if (toShow) {
-		toShow.classList.toggle('hidden');
-		toHide.classList.toggle('hidden');
-		if (scroll)
-			toShow.scrollIntoView();
+	if (toggleButton) {
+		toggleButton.classList.toggle('hidden');
+		toggleContainer.classList.toggle('hidden');
+		if (!toggleContainer.classList.contains('hidden'))
+			toggleContainer.scrollIntoView();
 	} else {
-		toHide.parentNode.removeChild(toHide);
+		toggleContainer.parentNode.removeChild(toggleContainer);
 	}
 }
 
@@ -282,11 +281,11 @@ function resizeFullHeight(event) {
 	element.style.height = '';
 	let newHeight;
 	try {
-		newHeight = element.contentWindow.document.body.scrollHeight;
+		newHeight = element.contentWindow.document.body.scrollHeight + 20;
 		if (!newHeight) {
 			element.parentNode.style.height = '75vh';
 		} else {
-			element.style.height = newHeight + 'px';
+			element.parentNode.style.height = newHeight + 'px';
 		} 
 	} catch (error) {
 		element.parentNode.style.height = '75vh';
@@ -340,14 +339,14 @@ function logout(event) {
 	xmlhttp.onreadystatechange = function() {
 		if (xmlhttp.readyState == 4) {
 			console.log("logout");
+			//try to close windows
+			window.close();
+			if (event.target.getAttribute("href")=="") {
+				event.preventDefault();
+				document.body.textContent=texts.closeWindow;
+			}
 		}
 	};
-	xmlhttp.open("GET", "../tools", false);
+	xmlhttp.open("GET", "../tools", true);
 	xmlhttp.send();
-	//try to close windows
-	window.close();
-	if (this.getAttribute("href")=="") {
-		event.preventDefault();
-		document.write(texts.closeWindow);
-	}
 }

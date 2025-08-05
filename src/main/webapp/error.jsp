@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Error</title>
 <style type="text/css">
-#error-container { margin: auto; line-height: 1.6em; text-align: center; font-family: 'Impact'; }
+#error-container { margin: auto; line-height: 1.6em; text-align: center; font-family: 'Impact', sans-serif; }
 #error-container .error-title { text-transform: uppercase; }
 #error-container a:link, #error-container a:visited{ color: #881536; }
 #error-container a:hover, #error-container a:active{ color: #F8B505; }
@@ -19,20 +19,17 @@
 <body>
 	<div id="error-container">
 		<div class="error-title">
-			<h2>
-				Error
-			</h2>
-			
+			<h2>Error</h2>
+
 		</div>
 		<p>${e:forHtmlContent(param.errorMessage!=null ? param.errorMessage : errorMessage)}</p>
 		<p>
-			<script type="text/javascript">
+			<script>
 				if (history.length > 1) {
-					document
-							.write("<a href='javascript:history.back()'>Volver</a>");
+					document.write("<a href='javascript:history.back()'>Volver</a>");
 				}
 			</script>
 		</p>
-		</div>
+	</div>
 </body>
 </html>

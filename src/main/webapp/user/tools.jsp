@@ -1,8 +1,7 @@
-<%@page import="es.us.dit.lti.entity.Tool"%>
+<%@page import="es.us.dit.lti.entity.Tool,java.util.List"%>
 <%@page import="es.us.dit.lti.entity.Settings"%>
 <%@page import="es.us.dit.lti.entity.MgmtUserType,org.owasp.encoder.Encode"%>
-<%@page
-	import="es.us.dit.lti.entity.MgmtUser,es.us.dit.lti.persistence.ToolDao,java.util.List"%>
+<%@page	import="es.us.dit.lti.entity.MgmtUser,es.us.dit.lti.persistence.ToolDao"%>
 <%@page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <jsp:useBean id="mgmtUser" type="es.us.dit.lti.entity.MgmtUser" scope="session"></jsp:useBean>
@@ -16,6 +15,7 @@
 <title>Herramientas</title>
 <link rel="stylesheet" type="text/css" href="../css/style.css">
 <script src="../user/js/tools.js"></script>
+<script src="../js/move.js"></script>
 </head>
 <%
 List<Tool> tools = ToolDao.getAll(mgmtUser);
@@ -115,6 +115,5 @@ boolean tieneAdministrados = false;
 			</div>
 		</form>
 	</div>
-	<script src="../js/move.js"></script>
 </body>
 </html>

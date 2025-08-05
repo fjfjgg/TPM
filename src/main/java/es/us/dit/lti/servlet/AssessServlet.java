@@ -126,7 +126,6 @@ public class AssessServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		Calendar requestDate = Calendar.getInstance();
 		response.setContentType("text/html; charset=UTF-8");
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 		PrintWriter out;
@@ -144,7 +143,7 @@ public class AssessServlet extends HttpServlet {
 		final MessageMap text = (MessageMap) session.getAttribute("text");
 		boolean isReassessment = false;
 		boolean maxConcurrencyOnlyStoreMode = false;
-
+		
 		if (tool != null && userId != null && (ts.isLearner() || isInstructor)) {
 
 			// Use of streaming API
@@ -164,7 +163,8 @@ public class AssessServlet extends HttpServlet {
 			}
 
 			Iterator<Part> iter = null;
-			if (tool.isEnabled() && (isInstructor || tool.isEnabledByDate(requestDate, DEFAULT_GRACE_TIME))) {
+			if (tool.isEnabled()
+					&& (isInstructor || tool.isEnabledByDate(Calendar.getInstance(), DEFAULT_GRACE_TIME))) {
 				try {
 					// Parse the request
 					iter = request.getParts().iterator();
@@ -211,7 +211,6 @@ public class AssessServlet extends HttpServlet {
 			}
 
 			if (!error) {
-				String filename = null;
 				Part item = null;
 
 				// First item must be launchId
@@ -236,13 +235,14 @@ public class AssessServlet extends HttpServlet {
 					out.println(formatError(text.get("T_ERROR_CORRECCION_SIMULTANEA")));
 				}
 
-				String userFilePath = null;
-				String outputPath = null;
 				// Save attempt in db
 				final Attempt attempt = new Attempt();
 				attempt.setInstant(Instant.now());
 				attempt.setResourceUser(ts.getLtiResourceUser());
 				attempt.setOriginalResourceUser(ts.getLtiResourceUser());
+				String userFilePath = null;
+				String outputPath = null;
+				String filename = null;
 				// TODO storageType for now the default is used
 				if (!error) {
 
@@ -259,7 +259,7 @@ public class AssessServlet extends HttpServlet {
 									baos.close();
 									if (tool.getDeliveryPassword().equals(baos.toString(StandardCharsets.UTF_8))) {
 										validDeliveryPassword = true;
-									} else if (!validDeliveryPassword){
+									} else if (!validDeliveryPassword) {
 										logger.warn("Tool {} User {}: incorrect delivery password", tool.getName(), userId);
 									}
 								} else if (item.getName().equals("sid") && isInstructor
@@ -432,13 +432,15 @@ public class AssessServlet extends HttpServlet {
 						attempt.setScore(scoreInt);
 						if (isInstructor) {
 							// Instructor is only testing
-							out.println("<p></<p><strong>(TEST) " + text.get("T_NOTA") + ":</strong> " + scoreInt * 0.1
+							out.println("<p id='score'><strong>(TEST) " + text.get("T_NOTA") + ":</strong> " 
+									+ String.format("%.1f", scoreInt * 0.1)
 									+ "</p>");
 							attempt.setErrorCode(OK_WITHOUT_OUTCOME);
 						} else if (OutcomeService.writeOutcome(ts.getLtiResourceUser(), ts.getToolKey(),
 								String.valueOf(scoreInt * 0.01))) {
 							attempt.setErrorCode(OK_WITH_OUTCOME);
-							out.println("<p></<p><p><strong>" + text.get("T_NOTA") + ":</strong> " + scoreInt * 0.1
+							out.println("<p id='score'><strong>" + text.get("T_NOTA") + ":</strong> "
+									+ String.format("%.1f", scoreInt * 0.1)
 									+ "</p>");
 						} else {
 							out.println(formatError(text.get("T_ERROR_WRITE_OUTCOME")));
@@ -464,9 +466,11 @@ public class AssessServlet extends HttpServlet {
 						if (!tui.isRedirectMode()) {
 							// Generate iframe
 							String secureId = SecurityUtil.getSecureSid(attempt);
-							out.println("<iframe class='resized' src='attempt/" + URLDecoder
-									.decode(attempt.getResourceUser().getUser().getSourceId(), StandardCharsets.UTF_8)
-									+ "/output/" + secureId + "'></iframe>");
+							out.println(
+									"<div class='resizer'><iframe class='resized outputframe' src='attempt/"
+											+ URLDecoder.decode(attempt.getResourceUser().getUser().getSourceId(),
+													StandardCharsets.UTF_8)
+											+ "/output/" + secureId + "'></iframe></div>");
 						} else {
 							// Copy to response
 							try (BufferedInputStream br = new BufferedInputStream(new FileInputStream(resultFile));) {
@@ -475,7 +479,7 @@ public class AssessServlet extends HttpServlet {
 								br.transferTo(wos);
 								wos.flush();
 							} catch (final IOException e) {
-								out.println("<p><b>" + text.get("T_ERROR_IO") + "</b></p>");
+								out.println(formatError(text.get("T_ERROR_IO")));
 							}
 
 							if (!attempt.isOutputSaved() && !resultFile.delete()) {

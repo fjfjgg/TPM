@@ -230,10 +230,10 @@ public class SshToolRunner implements ToolRunner {
 			if (is != null) {
 				script = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 			} else {
-				script = "echo ERROR SCRIPT DOES NOT EXIST; exit " + ToolRunner.ERROR_RUNNER_EXCEPTION;
+				script = "echo ERROR SCRIPT DOES NOT EXIST; exit " + ERROR_RUNNER_EXCEPTION;
 			}
 		} catch (final IOException e) {
-			script = "echo ERROR READING SCRIPT; exit " + ToolRunner.ERROR_RUNNER_EXCEPTION;
+			script = "echo ERROR READING SCRIPT; exit " + ERROR_RUNNER_EXCEPTION;
 		}
 
 		final ExecutionRestrictionsConfig er = ExecutionRestrictionsConfig.fromString(executionRestrictions);

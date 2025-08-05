@@ -128,7 +128,7 @@ public class ToolUiConfig implements Serializable {
 	private boolean maxAttemptsDependsOnFilenames = false;
 
 	/**
-	 * MIME type of output (default is text/html")
+	 * MIME type of output (default is text/html").
 	 */
 	private String outputMimeType = "text/html";
 
@@ -157,7 +157,7 @@ public class ToolUiConfig implements Serializable {
 	 * Name of the file that will contain the text written by the user.
 	 */
 	private String textFilename = null;
-
+	
 
 	/**
 	 * Gets the name of the file that will contain the instructors' commands.

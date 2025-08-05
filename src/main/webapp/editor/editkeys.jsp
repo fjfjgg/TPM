@@ -13,11 +13,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
-	<meta name="viewport" content="width=device-width, initial-scale=1" >
-	<title>Claves de la herramienta</title>
-	<link rel="stylesheet" type="text/css" href="../css/style.css">
-	<script type="text/javascript" src="js/editkeys.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claves de la herramienta</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script src="js/editkeys.js"></script>
+<script src="../js/move.js"></script>
 </head>
 <body>
   <%@include file="/WEB-INF/includes/cabecera.jsp" %>
@@ -150,6 +151,5 @@
 		</form>
 		<% } %>
 	</div>
-  <script src="../js/move.js"></script>
 </body>
 </html>

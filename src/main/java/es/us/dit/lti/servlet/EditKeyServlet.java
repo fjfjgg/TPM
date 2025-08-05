@@ -94,7 +94,7 @@ public class EditKeyServlet extends HttpServlet {
 		final String contextId = request.getParameter("context");
 		final String resourceLinkId = request.getParameter("link");
 		final String address = request.getParameter("address");
-		
+
 		ToolKey old = null;
 		if (oldKey != null) {
 			old = ToolKeyDao.get(oldKey, false);
@@ -145,7 +145,7 @@ public class EditKeyServlet extends HttpServlet {
 	 * @param response       the HTTP response
 	 * @param key            the consumer key
 	 * @param secret         the secret
-	 * @param address		 the address regex
+	 * @param address        the address regex
 	 * @param enabled        if key is enabled
 	 * @param consumerGuid   the consumer GUID (constraint)
 	 * @param contextId      the context ID (constraint)
@@ -189,7 +189,7 @@ public class EditKeyServlet extends HttpServlet {
 			try {
 				// test pattern
 				if (address != null && !address.isBlank()) {
-					Pattern.matches(address, ""); //ignore return value
+					Pattern.compile(address); // ignore return value
 				}
 				if (ToolKeyDao.create(tk)) {
 					response.getWriter().append("Creada");
@@ -238,7 +238,7 @@ public class EditKeyServlet extends HttpServlet {
 	 * @param response the HTTP response
 	 * @param key      the consumer key
 	 * @param secret   the secret
-	 * @param address		 the address regex
+	 * @param address  the address regex
 	 * @param enabled  it tool key is enabled
 	 * @param old      old tool key data
 	 * @throws IOException if HTTP response can not be written
@@ -246,7 +246,7 @@ public class EditKeyServlet extends HttpServlet {
 	private void editKey(HttpServletResponse response, String key, String secret, String address, boolean enabled,
 			ToolKey old) throws IOException {
 		if (old.getKey().equals(key) && old.getSecret().equals(secret) && old.isEnabled() == enabled
-				&& Objects.equals(old.getAddress(),address)) {
+				&& Objects.equals(old.getAddress(), address)) {
 			// no changes
 			response.getWriter().append("Ignorada");
 		} else {
@@ -258,7 +258,7 @@ public class EditKeyServlet extends HttpServlet {
 			try {
 				// test pattern
 				if (address != null && !address.isBlank()) {
-					Pattern.matches(address, ""); //ignore return value
+					Pattern.compile(address); // ignore return value
 				}
 				if (ToolKeyDao.update(old)) {
 					response.getWriter().append("Editada");

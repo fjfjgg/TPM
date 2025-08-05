@@ -11,6 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" >
 <link rel="stylesheet" type="text/css" href="../css/style.css">
 <title>Asociar usuarios</title>
+<script src="../js/move.js"></script>
 </head>
 <%
 request.setCharacterEncoding("UTF-8");
@@ -70,7 +71,6 @@ if (tool != null &&
 			</div>
 		</form>
 	</div>
-	<script src="../js/move.js"></script>
 </body>
 </html>
 <%

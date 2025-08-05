@@ -1,18 +1,18 @@
 <%@page import="es.us.dit.lti.persistence.MgmtUserDao"%>
 <%@page import="es.us.dit.lti.entity.MgmtUser"%>
 <%@page import="es.us.dit.lti.entity.Settings"%>
-<%@page
-	import="es.us.dit.lti.persistence.MgmtUserDao,java.util.List,org.owasp.encoder.Encode"%>
+<%@page import="java.util.List,org.owasp.encoder.Encode"%>
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <jsp:useBean id="text" type="es.us.dit.lti.MessageMap" scope="session" />
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
-	<meta name="viewport" content="width=device-width, initial-scale=1" >
-	<title>Lista de usuarios</title>
-	<link rel="stylesheet" type="text/css" href="../css/style.css">
-	<script src="js/users.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lista de usuarios</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script src="js/users.js"></script>
+<script src="../js/move.js"></script>
 </head>
 <body>
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
@@ -76,6 +76,5 @@
 			</div>
 		</form>
 	</div>
-	<script src="../js/move.js"></script>
 </body>
 </html>

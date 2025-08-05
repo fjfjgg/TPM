@@ -68,7 +68,7 @@ function showAttempts() {
 			if (error instanceof SyntaxError) {
 				container.innerHTML="<p class='error'>"+texts.errorClosedSession+"</p>";
 			} else {
-				container.innerHTML="<p class='error'>Error: "+error+"</p>";
+				container.innerHTML="<p class='error'>"+error+"</p>";
 			}
 		});
 }
@@ -295,7 +295,7 @@ function showOutput(event) {
 	let divr = document.createElement("div");
 	divr.className = "resizer";
 	let ifr = document.createElement("iframe");
-	ifr.className = "resized";
+	ifr.className = "resized outputframe";
 	ifr.src = this.href;
 	ifr.addEventListener("load", resizeFullHeight);
 	divr.appendChild(ifr);
@@ -306,7 +306,13 @@ function showOutput(event) {
 }
 
 window.addEventListener("load", function() {
-  let elem = document.getElementById("showattempts");
-  if (elem)
-    document.getElementById("showattempts").onclick = showAttempts; 
+	let elem = document.getElementById("showattempts");
+	if (elem) {
+		elem.addEventListener("click", function() {
+			let t = document.getElementById('tattempts');
+			if (!t) {
+				showAttempts();
+			}
+		});
+	}
 });

@@ -154,16 +154,6 @@ function changeUser() {
 	} else {
 		showAttempts();
 	}
-	
-	let closeButton = document.querySelector("#attempts legend .closefs");
-	if (closeButton) {
-		closeButton.addEventListener("click", cleanSelectedUser);
-	}
-}
-
-function cleanSelectedUser() {
-	let input = document.getElementById("selectUser");
-	input.value = "";
 }
 
 async function obtenerUsuarios() {
@@ -271,10 +261,6 @@ function activarAcciones() {
 	}
 	if (!document.getElementById('selectUser')) {
 		obtenerUsuarios();
-	} else {
-		let input = document.getElementById('selectUser');
-		input.value="";
-		input.lastvalue="";
 	}
 }
 

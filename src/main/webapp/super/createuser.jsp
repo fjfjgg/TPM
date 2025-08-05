@@ -36,7 +36,7 @@ pageContext.setAttribute("editMode", editMode);
 <link rel="stylesheet" type="text/css" href="../css/style.css">
 <script src="../user/js/pass.js"></script>
 <script src="js/adduser.js"></script>
-</head>
+<script src="../js/move.js"></script></head>
 <body>
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
 	<div class="h1container dialog">
@@ -98,6 +98,5 @@ pageContext.setAttribute("editMode", editMode);
 		</form>
 
 	</div>
-	<script src="../js/move.js"></script>
 </body>
 </html>

@@ -1,0 +1,24 @@
+#tool-modal {
+	width: 94%;
+	height: 82%;
+}
+
+#tool-modal-content {
+	width: 100%;
+	height: 92%;
+	overflow: hidden;
+}
+
+.resizer {
+	display: flex;
+	height: 75vh;
+	overflow: auto;
+}
+
+.resizer>.resized {
+	flex-grow: 1;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	width: 100%;
+}

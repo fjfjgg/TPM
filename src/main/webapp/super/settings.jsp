@@ -79,6 +79,7 @@ if (updated) {
 <title>Ajustes</title>
 <link rel="stylesheet" type="text/css" href="../css/style.css">
 <script src="../editor/js/edit.js"></script>
+<script src="../js/move.js"></script>
 </head>
 <body>
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
@@ -136,6 +137,5 @@ if (updated) {
 		</div>
 		</form>
 	</div>
-	<script src="../js/move.js"></script>
 </body>
 </html>

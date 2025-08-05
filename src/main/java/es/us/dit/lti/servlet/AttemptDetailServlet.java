@@ -101,10 +101,7 @@ public class AttemptDetailServlet extends HttpServlet {
 		 */
 		@Override
 		public boolean shouldSkipClass(Class<?> clazz) {
-			if (clazz == Instant.class) {
-				return true;
-			}
-			return false;
+			return clazz == Instant.class;
 		}
 	};
 

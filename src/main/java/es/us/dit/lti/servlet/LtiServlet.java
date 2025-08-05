@@ -104,7 +104,7 @@ public class LtiServlet extends HttpServlet {
 	/**
 	 * Processes LTI logout.
 	 *
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
 	@Override

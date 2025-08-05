@@ -14,11 +14,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
-	<meta name="viewport" content="width=device-width, initial-scale=1" >
-	<title>Información de la herramienta</title>
-	<link rel="stylesheet" type="text/css" href="../css/style.css">
-	<script src="js/edit.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Información de la herramienta</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script src="js/edit.js"></script>
+<script src="../js/move.js"></script>
 </head>
 <body>
 	<%@include file="/WEB-INF/includes/cabecera.jsp" %>
@@ -161,6 +162,5 @@
 	   <div id='src-modal-content' class='modal-content'><pre><code id="src01"></code></pre></div>
 	</div>
 <% } %>
-	<script src="../js/move.js"></script>
 </body>
 </html>

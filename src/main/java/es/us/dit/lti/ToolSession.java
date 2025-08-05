@@ -558,7 +558,7 @@ public final class ToolSession implements Serializable {
 					break;
 				}
 			}
-			if (role.length() > 0 && roles.add(role)) {
+			if (!role.isEmpty() && roles.add(role)) {
 				// Detect common roles
 				if (ArrayUtils.contains(LEARNER_ALIASES, role)) {
 					isLearner = true;
@@ -1099,10 +1099,11 @@ public final class ToolSession implements Serializable {
 	 * @param learner       if it is a learner session
 	 * @param instructor    if it is a instructor session
 	 * @param remoteAddress remote address of tool session
+	 * @param outcomeSrvUrl URL of test outcome service
 	 * @return if it is valid
 	 */
 	public boolean initTest(Tool tool, String launchId, String sessionUser, String title, boolean learner,
-			boolean instructor, String remoteAddress) {
+			boolean instructor, String remoteAddress, String outcomeSrvUrl) {
 
 		final String consumerGuid = "test";
 		final String contextId = "test";
@@ -1222,7 +1223,7 @@ public final class ToolSession implements Serializable {
 			auxResourceLink.setContext(context);
 			auxResourceLink.setResourceId(resourceLinkId);
 			auxResourceLink.setTitle("test");
-			auxResourceLink.setOutcomeServiceUrl(null);
+			auxResourceLink.setOutcomeServiceUrl(outcomeSrvUrl);
 			if (toolKey.getSid() != 0) {
 				auxResourceLink.setToolKey(toolKey);
 			}
@@ -1236,6 +1237,7 @@ public final class ToolSession implements Serializable {
 			}
 		} else {
 			resourceLink.setTool(tool);
+			resourceLink.setOutcomeServiceUrl(outcomeSrvUrl);
 			if (resourceLink.getToolKey() == null
 					|| resourceLink.getToolKey() != null && toolKey.getSid() != resourceLink.getToolKey().getSid()) {
 				// Update
@@ -1281,7 +1283,11 @@ public final class ToolSession implements Serializable {
 			final ResourceUser auxResourceUser = new ResourceUser();
 			auxResourceUser.setResourceLink(resourceLink);
 			auxResourceUser.setUser(user);
-			auxResourceUser.setResultSourceId(null);
+			if (outcomeSrvUrl != null && learner) {
+				auxResourceUser.setResultSourceId("0");
+			} else {
+				auxResourceUser.setResultSourceId(null);
+			}
 			// if not exist, create
 			if (!ToolResourceUserDao.create(auxResourceUser)) {
 				logger.error("I can't continue because I can't create the resource user");
@@ -1292,6 +1298,10 @@ public final class ToolSession implements Serializable {
 			}
 		}
 
+		if (tool.isOutcome()) {
+			//Test outcome
+			resourceLink.setCustomProperty("custom_nocal", "false");
+		}
 		// Session data
 		// - roles, outcome, presentation
 		outcomeAllowed = !isWithoutOutcome();

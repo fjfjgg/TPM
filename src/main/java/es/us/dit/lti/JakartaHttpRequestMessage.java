@@ -61,7 +61,7 @@ public class JakartaHttpRequestMessage extends OAuthMessage {
 			final String name = entry.getKey();
 			if (name.equals("Authorization")) {
 				for (final String value : entry.getValue()) {
-					for (final OAuth.Parameter parameter : OAuthMessage.decodeAuthorization(value)) {
+					for (final OAuth.Parameter parameter : decodeAuthorization(value)) {
 						if (!"realm".equalsIgnoreCase(parameter.getKey())) {
 							addParameter(parameter);
 						}

@@ -72,11 +72,11 @@ public enum StorageType {
 	 */
 	public static StorageType fromInt(int type) {
 		// Decode type
-		for (final StorageType t : StorageType.values()) {
+		for (final StorageType t : values()) {
 			if (type == t.getCode()) {
 				return t;
 			}
 		}
-		return StorageType.UNKNOWN;
+		return UNKNOWN;
 	}
 }

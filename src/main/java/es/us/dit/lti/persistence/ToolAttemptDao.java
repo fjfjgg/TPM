@@ -147,7 +147,7 @@ public final class ToolAttemptDao {
 			+ ToolResourceUserDao.RU_TABLE_NAME + ".resource_sid=" + ToolResourceLinkDao.RL_TABLE_NAME + ".sid AND "
 			+ ToolResourceUserDao.RU_TABLE_NAME + ".lti_user_sid=" + ToolConsumerUserDao.LTI_USER_TABLE_NAME
 			+ ".sid AND " + ToolResourceLinkDao.RL_TABLE_NAME
-			+ ".tool_key_sid=? ORDER BY epoch_seconds ASC, nanoseconds ASC";
+			+ ".tool_key_sid=? ORDER BY epoch_seconds ASC, nanoseconds ASC, " + AT_TABLE_NAME + ".sid ASC";
 
 	/**
 	 * Utility class that provides methods for managing connections to a database.
@@ -611,7 +611,7 @@ public final class ToolAttemptDao {
 
 		final SecurityUtil.SecuredSid sSid = SecurityUtil.getPlainSecuredSid(securedSid, AT_SERIAL_VERSION_UID);
 		if (sSid.sid > 0) {
-			attempt = ToolAttemptDao.getBySid(sSid.sid);
+			attempt = getBySid(sSid.sid);
 			if (attempt == null || sSid.verifier != attempt.getInstant().toEpochMilli()
 					|| attempt.getResourceUser().getResourceLink().getToolKey().getSid() != tk.getSid()) { 
 				// Error

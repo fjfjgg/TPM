@@ -107,150 +107,144 @@ if (tool != null && tool.getName() != null) {
 	<% } %>
 </head>
 <body>
-    <div class="locationPane">
-		<div id="contentPanel" class="contentPane contcollapsed">
-			<div class="shadow">
-				<div id="editmodeWrapper">
-					<div id="content" class="contentBox">
-						<div id="pageTitleDiv" class="pageTitle clearfix ">
-							<div id="pageTitleBar" class='pageTitleIcon'>
-						  		<h1 id="pageTitleHeader"><span id="pageTitleText">
-						  			<span style="color:#000000;"><%=Encode.forHtmlContent(titulo) %></span>  </span></h1>
-						  		<% if (Settings.getAppName()== null || Settings.getAppName().isEmpty()) { %>
-						  		<p><fmt:message key="T_NOMBRE_LTI"/> - Departamento de Ingeniería Telemática - Universidad de Sevilla</p>
-						  		<% } else { %>
-						  		<p><%=Settings.getAppName() %></p>
-						  		<% } %>
-							</div>
-							<%
-							//Is there a notice?
-							String notice = es.us.dit.lti.entity.Settings.getNotice();
-							if (notice != null && !notice.isEmpty() ) {
-								%>
-							<div id="notice"><%=notice %></div>
-								<%
-							}	
-							%>
-						</div>
-						<div id="containerdiv" class="container clearfix">
-							<%
-							if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty() && tui.isPasswordProtected()
-									&& !tool.getDeliveryPassword().equals(request.getParameter("password"))) {
-								session.removeAttribute("extraFileAuthorized");
-							%>
-							<div>
-								<form id="fsdelivery" action="" method="post">
-									<input type="hidden" name="launchId" value="${ts.launchId}" />
-									<% if (request.getParameter("password")!=null) { %>
-										<p><fmt:message key="T_ERROR_AUTORIZACION"/></p>
-									<% } %>
-									<p>
-										<input type="password" name="password" autocomplete="off"
-											placeholder="<fmt:message key="T_CLAVE_ENTREGA"/>" required autofocus/>
-									</p>
-									<p>
-										<button class="genericButton">
-											<span class="material-icons">send</span>
-										</button>
-									</p>
-								</form>
-							</div>	
-							<%
-							} else {
-								session.setAttribute("extraFileAuthorized", true);
-							%>
-							<fieldset id="description" class="infocontainer" data-toggle="parentdescription">
-								<legend><fmt:message key="T_DESCRIPCION"/></legend>
-								<%
-								try (FileInputStream br = new FileInputStream(tool.getDescriptionPath());) {
-									WriterOutputStream wos = WriterOutputStream.builder().setWriter(out)
-											   .setCharset(StandardCharsets.UTF_8).get();
-									br.transferTo(wos);
-									wos.flush();
-								} catch (IOException e) {
-									%>
-									<p><strong><fmt:message key="T_ERROR_DESCRIPCION"/></strong></p>
-									<%
-								}
-								%>
-							</fieldset>
-							<%if (tui.isShowAttempts()) { %>
-								<fieldset id="attempts" class="infocontainer hidden" data-toggle="parentattempts">
-									<legend><fmt:message key="T_INTENTOS_ANTERIORES"/></legend>
-									<div id="attemptlist"></div>
-								</fieldset>
-							<%} %>
-							<p id="parentdescription" class="toggleButton hidden">
-									<a id="showdescription" title="<fmt:message key="T_MOSTRAR_DESCRIPCION"/>" class="genericButton" data-toggle="description">
-									<span class="material-icons">description</span></a></p>	
-							<%if (tui.isShowAttempts()) { %>
-								<p id="parentattempts" class="toggleButton">
-									<a id="showattempts" title="<fmt:message key="T_MOSTRAR_INTENTOS"/>" class="genericButton"
-										data-toggle="attempts">
-									<span class="material-icons" accessKey="p">restore</span></a></p>								
-							<%} %>
-							<p id="parentassessment" class="toggleButton hidden">
-									<a id="showassessment" title="<fmt:message key="T_MOSTRAR_RESULTADOS"/>" class="genericButton" data-toggle="resultoutput">
-									<span class="material-icons">assessment</span></a></p>
-							<p id="parentdelivery" class="toggleButton hidden">
-									<a id="showdelivery" title="<fmt:message key="T_MOSTRAR_FORMULARIO"/>" class="genericButton" data-toggle="fsdelivery">
-									<span class="material-icons">plagiarism</span></a></p>
-							<div id="result"></div>
-							<%if ( tui.getMaxAttempts() != 0 && tool.isEnabledByDate() ) { %>
-							<form id="formdelivery">
-								<input type="hidden" id="launchId" value="${ts.launchId}" />
-								<fieldset id="fsdelivery" data-toggle="parentdelivery">
-									<legend> ${e:forHtml(! empty ts.tool.toolUiConfig.legendForm ? ts.tool.toolUiConfig.legendForm : text.T_ENTREGA)} </legend>
-									<p>
-									<% if (tool. getEnabledUntil() != null) { %>
-									<b><fmt:message key="T_HABILITADA_HASTA"/>: </b> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/><br />
-									<% } %>
-									<%if (tui.isEnableSendText()) { %>
-									<fmt:message key="T_ESCRIBA_TEXTO"/>
-									<%} else { %>
-									<fmt:message key="T_SELECCIONA_ARCHIVO"/>
-									<%} %>
-									<span class="material-icons">plagiarism</span>. <fmt:message key="T_ADVERTENCIA_TAM"/> <%=inputFileSize%>kB.</p>
-									<%if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty()) { 
-										if (tui.isPasswordProtected()) { %>
-									<input type="hidden" id="password" value="${ts.tool.deliveryPassword}" />
-										<%											
-										} else {
-										%>
-									<p>	
-										<fmt:message key="T_CLAVE_ENTREGA"/>: 
-										<input type="password" id="password" autocomplete="off" required/>
-									</p>
-									<%} }%>
-									<p>
-									<%if (tui.isEnableSendText()) { %>
-									<textarea id="attempttext" rows="10" cols="70"></textarea>
-									<%} else { %>
-									<input type="file" id="attemptfile" />
-									<%} %>
-									</p>
-									<p>
-									<a id="assess" title="${e:forHtmlAttribute(! empty ts.tool.toolUiConfig.sendButtonText ? ts.tool.toolUiConfig.sendButtonText : text.T_BOTON_ENTREGAR)}"
-										 class="genericButton" >
-										<span class="material-icons">plagiarism</span></a>
-									</p>
-								</fieldset>
-							</form>
-							<%} else {%>
-								<input type="hidden" id="launchId" value="${ts.launchId}" />
-							<%}%>
-						<%
-						}
-						%>
-						</div>
-						<p id="plogout" class="">
-							<a id="alogout" title="<fmt:message key="T_SALIR"/>" class="genericButton" href="${ts.ltiReturnUrl}"> <span
-								class="material-icons" accesskey="x">logout</span></a>
-						</p>
-					</div>
-				</div>
+	<div id="content">
+		<div id="pageTitleDiv" class="pageTitle">
+			<div id="pageTitleBar">
+				<% if (!ts.isFrameMode()) { %>
+		  		<h1 id="pageTitleHeader"><span id="pageTitleText">
+		  			<%=Encode.forHtmlContent(titulo) %></span></h1>
+		  		<% }
+				   if (Settings.getAppName()== null || Settings.getAppName().isEmpty()) { %>
+		  		<p><fmt:message key="T_NOMBRE_LTI"/> - Departamento de Ingeniería Telemática - Universidad de Sevilla</p>
+		  		<% } else { %>
+		  		<p><%=Settings.getAppName() %></p>
+		  		<% } %>
 			</div>
+			<%
+			//Is there a notice?
+			String notice = es.us.dit.lti.entity.Settings.getNotice();
+			if (notice != null && !notice.isEmpty() ) {
+				%>
+			<div id="notice"><%=notice %></div>
+				<%
+			}	
+			%>
 		</div>
+		<div id="containerdiv" class="container">
+			<%
+			if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty() && tui.isPasswordProtected()
+					&& !tool.getDeliveryPassword().equals(request.getParameter("password"))) {
+				session.removeAttribute("extraFileAuthorized");
+			%>
+			<div>
+				<form id="fsdelivery" action="" method="post">
+					<input type="hidden" name="launchId" value="${ts.launchId}" />
+					<% if (request.getParameter("password")!=null) { %>
+						<p><fmt:message key="T_ERROR_AUTORIZACION"/></p>
+					<% } %>
+					<p>
+						<input type="password" name="password" autocomplete="off"
+							placeholder="<fmt:message key="T_CLAVE_ENTREGA"/>" required autofocus/>
+					</p>
+					<p>
+						<button class="genericButton">
+							<span class="material-icons">send</span>
+						</button>
+					</p>
+				</form>
+			</div>	
+			<%
+			} else {
+				session.setAttribute("extraFileAuthorized", true);
+			%>
+			<fieldset id="description" class="infocontainer" data-toggle="parentdescription">
+				<legend><fmt:message key="T_DESCRIPCION"/></legend>
+				<%
+				try (FileInputStream br = new FileInputStream(tool.getDescriptionPath());) {
+					WriterOutputStream wos = WriterOutputStream.builder().setWriter(out)
+							   .setCharset(StandardCharsets.UTF_8).get();
+					br.transferTo(wos);
+					wos.flush();
+				} catch (IOException e) {
+					%>
+					<p><strong><fmt:message key="T_ERROR_DESCRIPCION"/></strong></p>
+					<%
+				}
+				%>
+			</fieldset>
+			<%if (tui.isShowAttempts()) { %>
+				<fieldset id="attempts" class="infocontainer hidden" data-toggle="parentattempts">
+					<legend><fmt:message key="T_INTENTOS_ANTERIORES"/></legend>
+					<div id="attemptlist"></div>
+				</fieldset>
+			<%} %>
+			<p id="parentdescription" class="toggleButton hidden">
+					<a id="showdescription" title="<fmt:message key="T_MOSTRAR_DESCRIPCION"/>" class="genericButton" data-toggle="description">
+					<span class="material-icons">description</span></a></p>	
+			<%if (tui.isShowAttempts()) { %>
+				<p id="parentattempts" class="toggleButton">
+					<a id="showattempts" title="<fmt:message key="T_MOSTRAR_INTENTOS"/>" class="genericButton"
+						data-toggle="attempts">
+					<span class="material-icons" accessKey="p">restore</span></a></p>								
+			<%} %>
+			<p id="parentassessment" class="toggleButton hidden">
+					<a id="showassessment" title="<fmt:message key="T_MOSTRAR_RESULTADOS"/>" class="genericButton" data-toggle="resultoutput">
+					<span class="material-icons">assessment</span></a></p>
+			<p id="parentdelivery" class="toggleButton hidden">
+					<a id="showdelivery" title="<fmt:message key="T_MOSTRAR_FORMULARIO"/>" class="genericButton" data-toggle="fsdelivery">
+					<span class="material-icons">plagiarism</span></a></p>
+			<div id="result"></div>
+			<%if ( tui.getMaxAttempts() != 0 && tool.isEnabledByDate() ) { %>
+			<form id="formdelivery">
+				<input type="hidden" id="launchId" value="${ts.launchId}" />
+				<fieldset id="fsdelivery" data-toggle="parentdelivery">
+					<legend> ${e:forHtml(! empty ts.tool.toolUiConfig.legendForm ? ts.tool.toolUiConfig.legendForm : text.T_ENTREGA)} </legend>
+					<p>
+					<% if (tool. getEnabledUntil() != null) { %>
+					<b><fmt:message key="T_HABILITADA_HASTA"/>: </b> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/><br />
+					<% } %>
+					<%if (tui.isEnableSendText()) { %>
+					<fmt:message key="T_ESCRIBA_TEXTO"/>
+					<%} else { %>
+					<fmt:message key="T_SELECCIONA_ARCHIVO"/>
+					<%} %>
+					<span class="material-icons">plagiarism</span>. <fmt:message key="T_ADVERTENCIA_TAM"/> <%=inputFileSize%>kB.</p>
+					<%if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty()) { 
+						if (tui.isPasswordProtected()) { %>
+					<input type="hidden" id="password" value="${ts.tool.deliveryPassword}" />
+						<%											
+						} else {
+						%>
+					<p>	
+						<fmt:message key="T_CLAVE_ENTREGA"/>: 
+						<input type="password" id="password" autocomplete="off" required/>
+					</p>
+					<%} }%>
+					<p>
+					<%if (tui.isEnableSendText()) { %>
+					<textarea id="attempttext" rows="10" cols="70"></textarea>
+					<%} else { %>
+					<input type="file" id="attemptfile" />
+					<%} %>
+					</p>
+					<p>
+					<a id="assess" title="${e:forHtmlAttribute(! empty ts.tool.toolUiConfig.sendButtonText ? ts.tool.toolUiConfig.sendButtonText : text.T_BOTON_ENTREGAR)}"
+						 class="genericButton" >
+						<span class="material-icons">plagiarism</span></a>
+					</p>
+				</fieldset>
+			</form>
+			<%} else {%>
+				<input type="hidden" id="launchId" value="${ts.launchId}" />
+			<%}%>
+		<%
+		}
+		%>
+		</div>
+		<p id="plogout" class="">
+			<a id="alogout" title="<fmt:message key="T_SALIR"/>" class="genericButton" href="${ts.ltiReturnUrl}"> <span
+				class="material-icons" accesskey="x">logout</span></a>
+		</p>
 	</div>
 </body>
 </html>

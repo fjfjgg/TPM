@@ -6,10 +6,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
-	<meta name="viewport" content="width=device-width, initial-scale=1" >
-	<title>Desasociar usuarios</title>
-	<link rel="stylesheet" type="text/css" href="../css/style.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Desasociar usuarios</title>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script src="../js/move.js"></script>
 </head>
 <%
 request.setCharacterEncoding("UTF-8");
@@ -48,7 +49,6 @@ if (tool != null && ToolDao.getToolUserType(mgmtUser, tool) == MgmtUserType.ADMI
 			<% } %>
 		</form>
 	</div>
-	<script src="../js/move.js"></script>
 </body>
 </html>
 <%

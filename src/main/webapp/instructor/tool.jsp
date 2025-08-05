@@ -124,146 +124,140 @@ if (tool != null && tool.getName() != null) {
 	%>
 </head>
 <body>
-    <div class="locationPane">
-		<div id="contentPanel" class="contentPane contcollapsed">
-			<div class="shadow">
-				<div id="editmodeWrapper">
-					<div id="content" class="contentBox">
-						<div id="pageTitleDiv" class="pageTitle clearfix ">
-							<div id="pageTitleBar" class='pageTitleIcon'>
-						  		<h1 id="pageTitleHeader"><span id="pageTitleText">
-						  			<span style="color:#000000;"><%=Encode.forHtmlContent(titulo) %></span>  </span></h1>
-						  		<% if (Settings.getAppName()== null || Settings.getAppName().isEmpty()) { %>
-						  		<p><fmt:message key="T_NOMBRE_LTI"/> - Departamento de Ingeniería Telemática - Universidad de Sevilla</p>
-						  		<% } else { %>
-						  		<p><%=Settings.getAppName() %></p>
-						  		<% } %>
-							</div>
-							<%
-							//Is there a notice?
-							String notice = es.us.dit.lti.entity.Settings.getNotice();
-							if (notice != null && !notice.isEmpty() ) {
-								%>
-							<div id="notice"><%=notice %></div>
-								<%
-							}	
-							%>
-						</div>
-						<div id="containerdiv" class="container clearfix">
-							<fieldset id="description" class="infocontainer" data-toggle="parentdescription">
-								<legend><fmt:message key="T_DESCRIPCION"/></legend>
-								<%
-								session.setAttribute("extraFileAuthorized", true);
-								try (FileInputStream br = new FileInputStream(tool.getDescriptionPath());) {
-									WriterOutputStream wos = WriterOutputStream.builder().setWriter(out)
-											   .setCharset(StandardCharsets.UTF_8).get();
-									br.transferTo(wos);
-									wos.flush();
-								} catch (IOException e) {
-									%>
-									<p><strong><fmt:message key="T_ERROR_DESCRIPCION"/></strong></p>
-									<%
-								}
-								%>
-							</fieldset>
-							<fieldset id="instructor" class="infocontainer" data-toggle="parentinstructor">
-								<legend><fmt:message key="T_INFO_PROFESOR"/></legend>
-								<p id="tool"><b><fmt:message key="T_HERRAMIENTA"/>:</b> ${e:forHtml(ts.tool.name)}</p>
-								<p id="passt"><b><fmt:message key="T_CLAVE_ENTREGA"/>:</b> <span id="instructorpass">${e:forHtml(ts.tool.deliveryPassword)}</span></p>
-							    <p id="outcome"><b><fmt:message key="T_SUBIR_NOTA"/>:</b> ${ts.outcomeAllowed ? text['T_SI'] : text['T_NO']}</p>
-							    <p id="counter"><b><fmt:message key="T_CONTADOR_USO"/>:</b> ${ts.tool.counter }</p>
-							    <%
-							    if (!tool.isEnabled() || !ts.getToolKey().isEnabled()) {
-									out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA") + "</p>");
-								} else {
-									if (tool.getEnabledFrom() != null) { %>
-								<p id="enabledFrom" class='textCentered'><b><fmt:message key="T_HABILITADA_DESDE"/>: </b> <fmt:formatDate type="both" value="${ts.tool.enabledFrom.time}"/></p>
-									<% }
-									if (tool. getEnabledUntil() != null) { %>
-								<p id="enabledUntil" class='textCentered'><b><fmt:message key="T_HABILITADA_HASTA"/>: </b> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/></p>
-									<% }
-									if (!tool.isEnabledByDate()) {
-										out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA_FECHA") + "</p>");
-									}
-							    }
-							    if (tui.isEnableInstructorCommand()) {
-							    %>
-							    <p class="textCentered" id="show">+</p>
-							    <div id="divComando" class="hidden">
-							    	<p>${text.T_ENVIAR_COMANDO}:</p>
-							    	<textarea id="command" cols="70"></textarea>
-							    	<button id="sendComamnd" class="genericButton"><span class="material-icons">send</span></button>
-							    </div>
-							    <% } %>
-							</fieldset>
-							<%if (tui.isShowAttempts() || tui.isManageAttempts()) { %>
-								<fieldset id="attempts" class="infocontainer hidden" data-toggle="parentattempts">
-									<legend><fmt:message key="T_INTENTOS_ANTERIORES"/></legend>
-									<div id="attemptlist"></div>
-								</fieldset>
-							<%} %>
-							<p id="parentdescription" class="toggleButton hidden">
-									<a id="showdescription" title="<fmt:message key="T_MOSTRAR_DESCRIPCION"/>" class="genericButton" data-toggle="description">
-									<span class="material-icons">description</span></a></p>	
-							<p id="parentinstructor" class="toggleButton hidden">
-									<a id="showinstructor" title="Mostrar información para el profesor" class="genericButton"
-									  data-toggle="instructor">
-									<span class="material-icons">settings_applications</span></a></p>
-							<%if (tui.isShowAttempts() || tui.isManageAttempts()) { %>
-								<p id="parentattempts" class="toggleButton">
-									<a id="showattempts" title="<fmt:message key="T_MOSTRAR_INTENTOS"/>" class="genericButton"
-										data-toggle="attempts">
-									<span class="material-icons" accessKey="p">restore</span></a></p>								
-							<%} %>
-							<p id="parentassessment" class="toggleButton hidden">
-									<a id="showassessment" title="<fmt:message key="T_MOSTRAR_RESULTADOS"/>" class="genericButton" data-toggle="resultoutput">
-									<span class="material-icons">assessment</span></a></p>
-							<p id="parentdelivery" class="toggleButton hidden">
-									<a id="showdelivery" title="<fmt:message key="T_MOSTRAR_FORMULARIO"/>" class="genericButton" data-toggle="fsdelivery">
-									<span class="material-icons">plagiarism</span></a></p>
-							<div id="result"></div>
-							<%if ( tui.getMaxAttempts() != 0 ) { %>
-							<form id="formdelivery">
-								<input type="hidden" id="launchId" value="${ts.launchId}" />
-								<fieldset id="fsdelivery" data-toggle="parentdelivery">
-									<legend> ${e:forHtml(! empty ts.tool.toolUiConfig.legendForm ? ts.tool.toolUiConfig.legendForm : text.T_ENTREGA)} </legend>
-									<p>
-									<%if (tui.isEnableSendText()) { %>
-									<fmt:message key="T_ESCRIBA_TEXTO"/>
-									<%} else { %>
-									<fmt:message key="T_SELECCIONA_ARCHIVO"/>
-									<%} %>
-									<span class="material-icons">plagiarism</span>. <fmt:message key="T_ADVERTENCIA_TAM"/> <%=inputFileSize%>kB.</p>
-									<%if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty()) { %>
-									<p>	
-										<fmt:message key="T_CLAVE_ENTREGA"/>: 
-										<input type="password" id="password" autocomplete="off" required value="${ts.tool.deliveryPassword}"/>
-									</p>
-									<%} %>
-									<p>
-									<%if (tui.isEnableSendText()) { %>
-									<textarea id="attempttext" rows="10" cols="70"></textarea>
-									<%} else { %>
-									<input type="file" id="attemptfile" />
-									<%} %>
-									</p>
-									<p>
-									<a id="assess" title="${e:forHtmlAttribute(! empty ts.tool.toolUiConfig.sendButtonText ? ts.tool.toolUiConfig.sendButtonText : text.T_BOTON_ENTREGAR)}"
-										 class="genericButton" >
-										<span class="material-icons">plagiarism</span></a>
-									</p>
-								</fieldset>
-							</form>
-							<%} %>
-						</div>
-						<p id="plogout" class="">
-							<a id="alogout" title="<fmt:message key="T_SALIR"/>" class="genericButton" href="${ts.ltiReturnUrl}"> <span
-								class="material-icons" accesskey="x">logout</span></a>
-						</p>
-					</div>
-				</div>
+	<div id="content">
+		<div id="pageTitleDiv" class="pageTitle ">
+			<div id="pageTitleBar">
+		  		<% if (!ts.isFrameMode()) { %>
+		  		<h1 id="pageTitleHeader"><span id="pageTitleText">
+		  			<%=Encode.forHtmlContent(titulo) %></span></h1>
+		  		<% }
+				   if (Settings.getAppName()== null || Settings.getAppName().isEmpty()) { %>
+		  		<p><fmt:message key="T_NOMBRE_LTI"/> - Departamento de Ingeniería Telemática - Universidad de Sevilla</p>
+		  		<% } else { %>
+		  		<p><%=Settings.getAppName() %></p>
+		  		<% } %>
 			</div>
+			<%
+			//Is there a notice?
+			String notice = es.us.dit.lti.entity.Settings.getNotice();
+			if (notice != null && !notice.isEmpty() ) {
+				%>
+			<div id="notice"><%=notice %></div>
+				<%
+			}	
+			%>
 		</div>
+		<div id="containerdiv" class="container">
+			<fieldset id="description" class="infocontainer" data-toggle="parentdescription">
+				<legend><fmt:message key="T_DESCRIPCION"/></legend>
+				<%
+				session.setAttribute("extraFileAuthorized", true);
+				try (FileInputStream br = new FileInputStream(tool.getDescriptionPath());) {
+					WriterOutputStream wos = WriterOutputStream.builder().setWriter(out)
+							   .setCharset(StandardCharsets.UTF_8).get();
+					br.transferTo(wos);
+					wos.flush();
+				} catch (IOException e) {
+					%>
+					<p><strong><fmt:message key="T_ERROR_DESCRIPCION"/></strong></p>
+					<%
+				}
+				%>
+			</fieldset>
+			<fieldset id="instructor" class="infocontainer" data-toggle="parentinstructor">
+				<legend><fmt:message key="T_INFO_PROFESOR"/></legend>
+				<p id="tool"><b><fmt:message key="T_HERRAMIENTA"/>:</b> ${e:forHtml(ts.tool.name)}</p>
+				<p id="passt"><b><fmt:message key="T_CLAVE_ENTREGA"/>:</b> <span id="instructorpass">${e:forHtml(ts.tool.deliveryPassword)}</span></p>
+			    <p id="outcome"><b><fmt:message key="T_SUBIR_NOTA"/>:</b> ${ts.outcomeAllowed ? text['T_SI'] : text['T_NO']}</p>
+			    <p id="counter"><b><fmt:message key="T_CONTADOR_USO"/>:</b> ${ts.tool.counter }</p>
+			    <%
+			    if (!tool.isEnabled() || !ts.getToolKey().isEnabled()) {
+					out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA") + "</p>");
+				} else {
+					if (tool.getEnabledFrom() != null) { %>
+				<p id="enabledFrom" class='textCentered'><b><fmt:message key="T_HABILITADA_DESDE"/>: </b> <fmt:formatDate type="both" value="${ts.tool.enabledFrom.time}"/></p>
+					<% }
+					if (tool. getEnabledUntil() != null) { %>
+				<p id="enabledUntil" class='textCentered'><b><fmt:message key="T_HABILITADA_HASTA"/>: </b> <fmt:formatDate type="both" value="${ts.tool.enabledUntil.time}"/></p>
+					<% }
+					if (!tool.isEnabledByDate()) {
+						out.println("<p class='textCentered'>" + text.get("T_AVISO_DESHABILITADA_FECHA") + "</p>");
+					}
+			    }
+			    if (tui.isEnableInstructorCommand()) {
+			    %>
+			    <p class="textCentered" id="show">+</p>
+			    <div id="divComando" class="hidden">
+			    	<p>${text.T_ENVIAR_COMANDO}:</p>
+			    	<textarea id="command" cols="70"></textarea>
+			    	<button id="sendComamnd" class="genericButton"><span class="material-icons">send</span></button>
+			    </div>
+			    <% } %>
+			</fieldset>
+			<%if (tui.isShowAttempts() || tui.isManageAttempts()) { %>
+				<fieldset id="attempts" class="infocontainer hidden" data-toggle="parentattempts">
+					<legend><fmt:message key="T_INTENTOS_ANTERIORES"/></legend>
+					<div id="attemptlist"></div>
+				</fieldset>
+			<%} %>
+			<p id="parentdescription" class="toggleButton hidden">
+					<a id="showdescription" title="<fmt:message key="T_MOSTRAR_DESCRIPCION"/>" class="genericButton" data-toggle="description">
+					<span class="material-icons">description</span></a></p>	
+			<p id="parentinstructor" class="toggleButton hidden">
+					<a id="showinstructor" title="Mostrar información para el profesor" class="genericButton"
+					  data-toggle="instructor">
+					<span class="material-icons">settings_applications</span></a></p>
+			<%if (tui.isShowAttempts() || tui.isManageAttempts()) { %>
+				<p id="parentattempts" class="toggleButton">
+					<a id="showattempts" title="<fmt:message key="T_MOSTRAR_INTENTOS"/>" class="genericButton"
+						data-toggle="attempts">
+					<span class="material-icons" accessKey="p">restore</span></a></p>								
+			<%} %>
+			<p id="parentassessment" class="toggleButton hidden">
+					<a id="showassessment" title="<fmt:message key="T_MOSTRAR_RESULTADOS"/>" class="genericButton" data-toggle="resultoutput">
+					<span class="material-icons">assessment</span></a></p>
+			<p id="parentdelivery" class="toggleButton hidden">
+					<a id="showdelivery" title="<fmt:message key="T_MOSTRAR_FORMULARIO"/>" class="genericButton" data-toggle="fsdelivery">
+					<span class="material-icons">plagiarism</span></a></p>
+			<div id="result"></div>
+			<%if ( tui.getMaxAttempts() != 0 ) { %>
+			<form id="formdelivery">
+				<input type="hidden" id="launchId" value="${ts.launchId}" />
+				<fieldset id="fsdelivery" data-toggle="parentdelivery">
+					<legend> ${e:forHtml(! empty ts.tool.toolUiConfig.legendForm ? ts.tool.toolUiConfig.legendForm : text.T_ENTREGA)} </legend>
+					<p>
+					<%if (tui.isEnableSendText()) { %>
+					<fmt:message key="T_ESCRIBA_TEXTO"/>
+					<%} else { %>
+					<fmt:message key="T_SELECCIONA_ARCHIVO"/>
+					<%} %>
+					<span class="material-icons">plagiarism</span>. <fmt:message key="T_ADVERTENCIA_TAM"/> <%=inputFileSize%>kB.</p>
+					<%if (tool.getDeliveryPassword() != null && !tool.getDeliveryPassword().isEmpty()) { %>
+					<p>	
+						<fmt:message key="T_CLAVE_ENTREGA"/>: 
+						<input type="password" id="password" autocomplete="off" required value="${ts.tool.deliveryPassword}"/>
+					</p>
+					<%} %>
+					<p>
+					<%if (tui.isEnableSendText()) { %>
+					<textarea id="attempttext" rows="10" cols="70"></textarea>
+					<%} else { %>
+					<input type="file" id="attemptfile" />
+					<%} %>
+					</p>
+					<p>
+					<a id="assess" title="${e:forHtmlAttribute(! empty ts.tool.toolUiConfig.sendButtonText ? ts.tool.toolUiConfig.sendButtonText : text.T_BOTON_ENTREGAR)}"
+						 class="genericButton" >
+						<span class="material-icons">plagiarism</span></a>
+					</p>
+				</fieldset>
+			</form>
+			<%} %>
+		</div>
+		<p id="plogout" class="">
+			<a id="alogout" title="<fmt:message key="T_SALIR"/>" class="genericButton" href="${ts.ltiReturnUrl}"> <span
+				class="material-icons" accesskey="x">logout</span></a>
+		</p>
 	</div>
 </body>
 </html>

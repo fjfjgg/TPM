@@ -78,12 +78,12 @@ public enum MgmtUserType {
 	 */
 	public static MgmtUserType fromInt(int type) {
 		// Decode type
-		for (final MgmtUserType t : MgmtUserType.values()) {
+		for (final MgmtUserType t : values()) {
 			if (type == t.getCode()) {
 				return t;
 			}
 		}
-		return MgmtUserType.UNKNOWN;
+		return UNKNOWN;
 	}
 
 }
