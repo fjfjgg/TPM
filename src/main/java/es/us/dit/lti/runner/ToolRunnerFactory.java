@@ -54,6 +54,9 @@ public final class ToolRunnerFactory {
 		case TR_STORAGE:
 			tr = new StorageRunner();
 			break;
+		case TR_SSHJ:
+			tr = new SshJavaToolRunner();
+			break;
 		default:
 			tr = new DummyRunner();
 			break;

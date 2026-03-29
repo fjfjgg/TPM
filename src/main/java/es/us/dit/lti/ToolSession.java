@@ -676,12 +676,15 @@ public final class ToolSession implements Serializable {
 
 		// Send errors in requested locale
 		presentationLocale = request.getParameter("launch_presentation_locale");
-
+		
 		if (!checkMinimumRequirements(request.getParameterMap())) {
 			logger.error("The request does not meet the minimum requirements.");
 			return valid;
 		}
 
+		// Roles, load first to check IP
+		setRoles(request.getParameter("roles"));
+		
 		// Get key information
 		final String consumerGuid = request.getParameter("tool_consumer_instance_guid").trim();
 		final String contextId = request.getParameter("context_id").trim();
@@ -914,8 +917,7 @@ public final class ToolSession implements Serializable {
 		}
 
 		// Session data
-		// - roles, outcome, presentation
-		setRoles(request.getParameter("roles"));
+		// - outcome, presentation
 		outcomeAllowed = !isWithoutOutcome();
 		presentationDocumentTarget = request.getParameter("launch_presentation_document_target");
 		frameMode = presentationDocumentTarget != null && presentationDocumentTarget.endsWith("frame");
@@ -956,7 +958,7 @@ public final class ToolSession implements Serializable {
 					&& (tk.getConsumer() == null || consumerGuid.equals(tk.getConsumer().getGuid()))
 					&& (tk.getContext() == null || contextId.equals(tk.getContext().getContextId()))
 					&& (tk.getResourceLink() == null || resourceLinkId.equals(tk.getResourceLink().getResourceId()))
-					&& (tk.getAddress() == null || tk.getAddress().isBlank()
+					&& (isInstructor || tk.getAddress() == null || tk.getAddress().isBlank()
 							|| Pattern.matches(tk.getAddress(), remoteAddress))) {
 				toolKey = tk;
 				tool = tk.getTool();

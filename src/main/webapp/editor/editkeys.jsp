@@ -139,7 +139,7 @@
 					<div id="resourceLink" title="Enlace al que se restringe esta clave">Enlace</div>
 					<div><input type="text" id="formResourceLink" value="" disabled="disabled" /></div>
 
-					<div id="address" title="Expresión regular de la IP remota a la que se restringe esta clave">Patrón de dirección remota</div>
+					<div id="address" title="Expresión regular de la IP remota a la que se restringe esta clave">Patrón de dirección IP<br /> remota del estudiante</div>
 					<div><input type="text" id="formAddress" value="" /></div>
 				</div>
 			</div>

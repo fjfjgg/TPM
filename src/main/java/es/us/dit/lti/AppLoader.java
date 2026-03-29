@@ -41,6 +41,7 @@ import es.us.dit.lti.persistence.ToolKeyDao;
 import es.us.dit.lti.persistence.ToolNonceDao;
 import es.us.dit.lti.persistence.ToolResourceLinkDao;
 import es.us.dit.lti.persistence.ToolResourceUserDao;
+import es.us.dit.lti.runner.SshJavaToolRunner;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
@@ -74,6 +75,7 @@ public class AppLoader implements ServletContextListener {
 		if (appDbUtil != null) {
 			appDbUtil.destroy();
 		}
+		SshJavaToolRunner.cleanCache();
 	}
 
 	/**

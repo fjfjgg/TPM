@@ -45,8 +45,12 @@ public enum ToolRunnerType {
 	/**
 	 * No execution, only storage.
 	 */
-	TR_STORAGE(4);
-
+	TR_STORAGE(4),
+	/**
+	 * Remote execution via SSH (Java native).
+	 */
+	TR_SSHJ(5);
+	
 	/**
 	 * Code associated to type, for saving in db.
 	 */

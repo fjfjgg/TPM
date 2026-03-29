@@ -73,9 +73,12 @@ public class ExtraDescriptionFilesServlet extends HttpServlet {
 		// Check if user is authorized
 		String extraFolderPath = getExtraFolderPath(request);
 		if (extraFolderPath != null) {
-			File file = new File(extraFolderPath + request.getPathInfo());
+			// Normalize base directory
+			final File baseDir = new File(extraFolderPath).getCanonicalFile();
+			final File file = new File(baseDir, request.getPathInfo()).getCanonicalFile();
+			final String basePath = baseDir.getPath() + File.separator;
 			try {
-				if (!file.isFile() || !file.canRead()) {
+				if (!file.isFile() || !file.canRead() || !file.getPath().startsWith(basePath)) {
 					response.sendError(HttpServletResponse.SC_NOT_FOUND);
 				} else {
 
