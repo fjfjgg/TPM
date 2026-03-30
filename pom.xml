@@ -96,7 +96,7 @@
 			
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.4.0</version>
+				<version>3.5.1</version>
 				<configuration>
 					<warSourceDirectory>src/main/webapp</warSourceDirectory>
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
@@ -126,7 +126,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.3.1</version>
+				<version>3.4.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -156,7 +156,7 @@
 			<plugin>
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
-				<version>12.1.1</version>
+				<version>12.2.0</version>
 				<configuration>
 					<skipProvidedScope>true</skipProvidedScope>
 					<skipRuntimeScope>true</skipRuntimeScope>
@@ -173,7 +173,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<?m2e execute onIncremental?>
@@ -196,7 +196,7 @@
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
     			<artifactId>spotbugs-maven-plugin</artifactId>
-    			<version>4.9.8.1</version>
+    			<version>4.9.8.3</version>
 				<configuration>
                 	<excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
