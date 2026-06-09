@@ -262,7 +262,7 @@ public class SshJavaToolRunner implements ToolRunner {
 					if (runScp(server, filePath, remoteFile) == 0) {
 						// execute
 						result = runExec(server, tc.getCorrector() + " " + remoteFile + " " + userId + " "
-								+ originalFilename + " " + counter + " " + isInstructor + String.join(" ", extraArgs),
+								+ originalFilename + " " + counter + " " + isInstructor + " " + String.join(" ", extraArgs),
 								fw, fwe, maxSecondsWait);
 						
 					}
