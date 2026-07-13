@@ -50,7 +50,7 @@ public final class Settings {
 	 * Prohibited characters in user and file names.
 	 */
 	private static final char[] CHAR_INVALIDS = { '\\', '/', '*', '?', '"', '\'', '<', '>', '|', '[', ']', '\'', ';',
-			'=', ',', ' ', '$' };
+			'=', ',', ' ', '$', '&' };
 	/**
 	 * Character that replaces prohibited characters.
 	 */
